@@ -21,7 +21,6 @@ var Player = function (gl) {
 	this.buffer = gl.createBuffer();
 	gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
 	gl.bufferData( gl.ARRAY_BUFFER,	flatten(this.points), gl.STATIC_DRAW );
-	this.velocity = 0;
 	
 	
 	this.attachShaders();
@@ -53,13 +52,7 @@ Player.prototype.attachVariables = function() {
 }
 
 Player.prototype.moveX = function(forward) {
-	this.velocity = 0.3;
-	this.velocity *= forward ? 1 : -1;
-}
-
-Player.prototype.movePlayer = function(forward) {
 	var change = forward ? this.deltaTrans : -this.deltaTrans;
-	change *= Math.abs(this.velocity);
 	if (this.points[this.leftTopMax][0] + change >= -1.01 && this.points[this.rightBottomMax][0] + change < 1.01) {
 		this.shiftX += change;
 		for (var i=0; i<this.points.length;i++) {
@@ -83,17 +76,9 @@ Player.prototype.moveY = function(forward) {
 }
 
 Player.prototype.render = function() {
-	var diff = 0.009;
-	this.movePlayer(this.velocity > 0.0);
 	gl.useProgram(this.shaderProgram);
 	gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
 	this.attachVariables();
 	this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.points.length);
-	if (this.velocity > 0.0 && this.velocity - diff > 0.0)
-		this.velocity = this.velocity - diff;
-	else if (this.velocity < 0.0 && this.velocity + diff < 0.0)
-		this.velocity = this.velocity + diff;
-	else
-		this.velocity=0.0;
 	//window.requestAnimFrame(this.render);
 }
