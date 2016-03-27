@@ -1,15 +1,14 @@
 # BlockCatcher
-This is a WebGL game in which you must catch as many blocks as possible until time runs out.
+This is a WebGL game in which you must catch as many blocks as possible until time runs out. 250 points is considered a win.
 
 ## Controls:
 
-		Try to get 250 points before time runs out!
-		Move Player Bar Left/Right - Left/Right Arrow Keys
-		Start Game - SPACE
+	Move Player Bar Left/Right - Left/Right Arrow Keys
+	Start Game - SPACE
 		
-		Red Blocks - 1 points
-		Blue Blocks - 5 points
-		White Blocks - 25 points
+	Red Blocks - 1 points
+	Blue Blocks - 5 points
+	White Blocks - 25 points
 
 Playing this game is really simple, you play as the green bar at the bottom of the screen. The objective
 is to catch blocks with the player bar before they fall off the screen using the left and right arrowkeys. To start press the
