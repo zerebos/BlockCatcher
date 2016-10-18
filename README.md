@@ -1,6 +1,10 @@
 # BlockCatcher
 This is a WebGL game in which you must catch as many blocks as possible until time runs out. 250 points is considered a win.
 
+## Demo:
+
+You can play a demo of the game at http://rauenzi.github.io/BlockCatcher/
+
 ## Controls:
 
 	Move Player Bar Left/Right - Left/Right Arrow Keys
