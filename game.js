@@ -10,9 +10,10 @@ var gl;
 
 var display,scoreDisplay,statusDisplay,playDisplay;
 
-var score = 0, scoreThreshold = 250;
+var score = 0, scoreThreshold = 500;
 var SetTime = 60;
 var gameStarted = false;
+var lastFrame = performance.now();
 
 function initializeGame() {
 
@@ -29,37 +30,71 @@ function initializeGame() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0); // background black
     gl.clear(gl.COLOR_BUFFER_BIT); // allows color
 	
-	
+	var timestep = lastFrame;
 	player = new Player(gl); // create new player
-	player.render();
+	player.render(false, false, 0);
 
-	render();
+	render(timestep);
 }
 
-function handleKey(event) {
+var keyEnum = { UP:0, DOWN:1, LEFT:2, RIGHT:3 };
+var keyArray = new Array(4);
+
+function keyDown(event) {
+	var keyCode = event.keyCode;
+	
+	if (keyCode == 32) { // SPACE
+		event.preventDefault();
+	}
+	else if (keyCode == 37) { // LEFT
+		event.preventDefault();
+		keyArray[keyEnum.LEFT] = true;
+	}
+	else if (keyCode == 38) { // UP
+		event.preventDefault();
+		keyArray[keyEnum.UP] = true;
+	}
+	else if (keyCode == 39) { // RIGHT
+		event.preventDefault();
+		keyArray[keyEnum.RIGHT] = true;
+	}
+	else if (keyCode == 40) { // DOWN
+		event.preventDefault();
+		keyArray[keyEnum.DOWN] = true;
+	}
+}
+
+function keyUp(event) {
 	var keyCode = event.keyCode;
 	if (keyCode == 32) { // SPACE
+		event.preventDefault();
 		startGame();
 	}
 	else if (keyCode == 37) { // LEFT
-		player.moveX(false);
+		event.preventDefault();
+		keyArray[keyEnum.LEFT] = false;
 	}
 	else if (keyCode == 38) { // UP
-		player.moveY(true);
+		event.preventDefault();
+		keyArray[keyEnum.UP] = false;
 	}
 	else if (keyCode == 39) { // RIGHT
-		player.moveX(true);
+		event.preventDefault();
+		keyArray[keyEnum.RIGHT] = false;
 	}
 	else if (keyCode == 40) { // DOWN
-		player.moveY(false);
+		event.preventDefault();
+		keyArray[keyEnum.DOWN] = false;
 	}
 }
 
-function render() {
+function render(frameStart) {
+	var timestep = frameStart - lastFrame;
+    lastFrame = frameStart;
 	gl.clear(gl.COLOR_BUFFER_BIT); // allows color
-	player.render();
+	player.render(keyArray[keyEnum.LEFT], keyArray[keyEnum.RIGHT], timestep);
 	for (var i=0;i<blocks.length;i++) {
-		blocks[i].render();
+		blocks[i].render(timestep);
 		if (blocks[i].points[blocks[i].rightBottomMax][1] <= player.points[player.leftTopMax][1] && blocks[i].points[blocks[i].leftTopMax][1] >= player.points[player.rightBottomMax][1] &&
 			blocks[i].points[blocks[i].rightBottomMax][0] >= player.points[player.leftTopMax][0] && blocks[i].points[blocks[i].leftTopMax][0] <= player.points[player.rightBottomMax][0]) {
 			score += blocks[i].blockData.points;

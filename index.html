@@ -79,7 +79,7 @@
 			</style>
     </head>
     
-    <body onload="initializeGame()" onkeydown="handleKey(event)">
+    <body onload="initializeGame()" onkeydown="keyDown(event)" onkeyup="keyUp(event)">
 		<h2 class="wide">Block Catcher</h2>
         <canvas id="gl-canvas" width="512" height="512"></canvas>
 		<br />
@@ -90,7 +90,7 @@
 		<br />
 		<div>
 		<fieldset><legend>Controls & Scoring</legend>
-		Try to get 250 points before time runs out!<br /><br />
+		Try to get 500 points before time runs out!<br /><br />
 		Move Player Bar Left/Right - Left/Right Arrow Keys<br />
 		Start Game - SPACE<br /><br />
 		Red Blocks - 1 points<br />

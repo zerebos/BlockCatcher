@@ -17,10 +17,11 @@ var Player = function (gl) {
 	numOfPoints = this.points.length;
 	this.shiftX = 0;
 	this.shiftY = 0;
-	this.deltaTrans = 0.05;
+	this.deltaTrans = 0.03;
 	this.buffer = gl.createBuffer();
 	gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
 	gl.bufferData( gl.ARRAY_BUFFER,	flatten(this.points), gl.STATIC_DRAW );
+	this.velocity = 0;
 	
 	
 	this.attachShaders();
@@ -51,8 +52,35 @@ Player.prototype.attachVariables = function() {
 	this.yshiftLoc = this.gl.getUniformLocation(this.shaderProgram,"yshift");
 }
 
-Player.prototype.moveX = function(forward) {
+/*Player.prototype.moveX = function(forward) {
+	var change = 0.05;
+	if (forward) {
+		this.velocity += change;
+		if (this.velocity > 0.25) 
+			this.velocity = 0.25;
+	}
+	else {
+		this.velocity -= change;
+		if (this.velocity < -0.25) 
+			this.velocity = -0.25;
+	}
+	//this.velocity *= forward ? 1 : -1;
+}
+
+Player.prototype.movePlayer = function(forward) {
 	var change = forward ? this.deltaTrans : -this.deltaTrans;
+	change *= Math.abs(this.velocity);
+	if (this.points[this.leftTopMax][0] + change >= -1.01 && this.points[this.rightBottomMax][0] + change < 1.01) {
+		this.shiftX += change;
+		for (var i=0; i<this.points.length;i++) {
+		this.points[i][0] = this.points[i][0]+change;
+		}
+	}
+}*/
+
+Player.prototype.moveX = function(forward, timestep) {
+	var change = forward ? this.deltaTrans : -this.deltaTrans;
+	change *= timestep/25;
 	if (this.points[this.leftTopMax][0] + change >= -1.01 && this.points[this.rightBottomMax][0] + change < 1.01) {
 		this.shiftX += change;
 		for (var i=0; i<this.points.length;i++) {
@@ -75,9 +103,30 @@ Player.prototype.moveY = function(forward) {
 //	}
 }
 
-Player.prototype.render = function() {
+/*Player.prototype.render = function(timestep) {
+	var diff = 0.25*timestep/1000;
+	this.movePlayer(this.velocity > 0.0);
 	gl.useProgram(this.shaderProgram);
 	gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
+	this.attachVariables();
+	this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.points.length);
+	if (this.velocity > 0.0 && this.velocity - diff > 0.0)
+		this.velocity = this.velocity - diff;
+	else if (this.velocity < 0.0 && this.velocity + diff < 0.0)
+		this.velocity = this.velocity + diff;
+	else
+		this.velocity=0.0;
+	//window.requestAnimFrame(this.render);
+}*/
+
+
+Player.prototype.render = function(left, right, timestep) {
+	gl.useProgram(this.shaderProgram);
+	gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
+	if (left)
+		this.moveX(false, timestep);
+	if (right)
+		this.moveX(true, timestep);
 	this.attachVariables();
 	this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.points.length);
 	//window.requestAnimFrame(this.render);

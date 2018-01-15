@@ -73,8 +73,6 @@ Block.prototype.attachVariables = function() {
 	
 	this.xshiftLoc = this.gl.getUniformLocation(this.shaderProgram,"xshift");
 	this.yshiftLoc = this.gl.getUniformLocation(this.shaderProgram,"yshift");
-	this.moveY(false);
-	this.gl.uniform1f(this.yshiftLoc,this.shiftY);
 }
 
 Block.prototype.moveX = function(forward) {
@@ -87,18 +85,22 @@ Block.prototype.moveX = function(forward) {
 	}
 }
 
-Block.prototype.moveY = function(forward) {
+Block.prototype.moveY = function(forward, timediff) {
 	var change = forward ? this.deltaTrans : -this.deltaTrans;
+	change *= timediff/25;
+	//console.log(change);
 	this.shiftY += change;
 	for (var i=0; i<this.points.length;i++) {
 		this.points[i][1] = this.points[i][1]+change;
 	}
 }
 
-Block.prototype.render = function() {
+Block.prototype.render = function(timediff) {
 	gl.useProgram(this.shaderProgram);
 	gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
 	this.attachVariables();
+	this.moveY(false, timediff);
+	this.gl.uniform1f(this.yshiftLoc,this.shiftY);
 	this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.points.length);
 	//window.requestAnimFrame(this.render);
 }
