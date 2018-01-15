@@ -100,9 +100,11 @@ function render(frameStart) {
 			score += blocks[i].blockData.points;
 			scoreDisplay.textContent = score;
 			blocks.splice(i,1);
+			i--;
 		}
 		else if (blocks[i].points[blocks[i].leftTopMax][1] <= -1.0) {
 			blocks.splice(i,1);
+			i--;
 		}
 	}
 	window.requestAnimFrame(render);
