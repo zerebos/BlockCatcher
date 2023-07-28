@@ -67,8 +67,8 @@ export default class Block {
         this.webgl.vertexAttribPointer(myPosition, 2, this.webgl.FLOAT, false, 0, 0);
         this.webgl.enableVertexAttribArray(myPosition);
         
-        this.xshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"xshift");
-        this.yshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"yshift");
+        this.xshiftLoc = this.webgl.getUniformLocation(this.shaderProgram, "xshift");
+        this.yshiftLoc = this.webgl.getUniformLocation(this.shaderProgram, "yshift");
 
         this.colorLocation = this.webgl.getUniformLocation(this.shaderProgram, "u_color");
         this.webgl.uniform4f(this.colorLocation, ...this.blockData.color, 1);

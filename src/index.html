@@ -7,12 +7,13 @@
     
     <body>
         <h2 class="wide">Block Catcher</h2>
-        <canvas id="gl-canvas" width="512" height="512"></canvas>
-        <br />
-        <div class="wide"><span id="play">Press SPACE to play!</span></div><br />
-        Your score: <span id="score">0</span><br />
-        Time remaining: <span id="time">01:00</span><br />
-        Game Status: <span id="status">Not Started</span><br />
+        <div class="flex column">
+            <div class="flex flex-space-evenly" id="hud"><span>Points: <span id="score">0</span></span><span>Time: <span id="time">01:00</span></span></div>
+            <div class="flex" id="canvas-wrap">
+                <canvas id="gl-canvas" width="512" height="512"></canvas>
+                <div class="flex column flex-justify-center overlay"><span id="status"></span><span id="play">Press SPACE to play!</span></div>
+            </div>
+        <div>
         <br />
         <div>
         <fieldset><legend>Controls & Scoring</legend>

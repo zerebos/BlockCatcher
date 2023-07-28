@@ -1,6 +1,10 @@
 import Player from "./player";
 import Block from "./block";
-import "./styles/base.css";
+import "./styles/index.css";
+
+
+const SCORE_THRESHOLD = process.env.PRODUCTION ? 500 : 1;
+const MAX_SECONDS = process.env.PRODUCTION ? 60 : 10;
 
 let player;
 const blocks = [];
@@ -14,13 +18,11 @@ const keyArray = new Array(4);
 let display, scoreDisplay, statusDisplay, playDisplay;
 
 let score = 0;
-const scoreThreshold = 500;
-const SetTime = 60;
 let gameStarted = false;
 let lastFrame = performance.now();
 let gameTimer;
 
-window.game = new class Game {
+export default new class Game {
     constructor() {
         this.render = this.render.bind(this);
         this.spawnBlocks = this.spawnBlocks.bind(this);
@@ -153,10 +155,13 @@ window.game = new class Game {
             gameStarted = true;
             score = 0;
             scoreDisplay.textContent = score;
-            statusDisplay.textContent = "Playing...";
-            statusDisplay.style.color = "gray";
-            playDisplay.textContent = "";
-            this.startTimer(SetTime, display);
+            // statusDisplay.textContent = "Playing...";
+            // statusDisplay.style.color = "gray";
+            statusDisplay.classList.remove("win");
+            statusDisplay.classList.remove("loss");
+            // playDisplay.textContent = "";
+            playDisplay.parentElement.style.opacity = 0;
+            this.startTimer(MAX_SECONDS, display);
         }
     }
 
@@ -169,14 +174,15 @@ window.game = new class Game {
             clearInterval(gameTimer);
             display.textContent = "01:00";
             gameStarted = false;
-            if (score >= scoreThreshold) {
+            if (score >= SCORE_THRESHOLD) {
                 statusDisplay.textContent = "YOU WON!";
-                statusDisplay.style.color = "green";
+                statusDisplay.classList.add("win");
             }
             else {
                 statusDisplay.textContent = "YOU LOST!";
-                statusDisplay.style.color = "red";
+                statusDisplay.classList.add("loss");
             }
+            playDisplay.parentElement.style.opacity = "";
             playDisplay.textContent = "Press SPACE to play again!";
         }
     }

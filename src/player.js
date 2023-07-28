@@ -43,9 +43,9 @@ export default class Player {
         this.webgl.vertexAttribPointer(myPosition, 2, this.webgl.FLOAT, false, 0, 0);
         this.webgl.enableVertexAttribArray(myPosition);
         
-        this.xshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"xshift");
+        this.xshiftLoc = this.webgl.getUniformLocation(this.shaderProgram, "xshift");
         this.webgl.uniform1f(this.xshiftLoc,this.shiftX);
-        this.yshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"yshift");
+        this.yshiftLoc = this.webgl.getUniformLocation(this.shaderProgram, "yshift");
 
         this.colorLocation = this.webgl.getUniformLocation(this.shaderProgram, "u_color");
         this.webgl.uniform4f(this.colorLocation, ...PLAYER_COLOR, 1);

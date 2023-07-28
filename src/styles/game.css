@@ -1,0 +1,39 @@
+#canvas-wrap {
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    transition: opacity 200ms ease;
+    opacity: 1;
+}
+
+.overlay span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+}
+
+#status {
+    font-size: 32px;
+}
+
+#status.loss {
+    color: red;
+}
+
+#status.win {
+    color: green;
+}
+
+#hud {
+    background-color: black;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
