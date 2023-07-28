@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.argv.some(a => a === "production");
 
 /* eslint-disable quote-props */
 
