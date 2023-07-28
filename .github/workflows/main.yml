@@ -14,15 +14,34 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
         
+      - name: ⚙️ Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+        
       - name: 🔧 Use Node.js 16
         uses: actions/setup-node@v2
         with:
           node-version: '16'
+          cache: 'pnpm'
+          
+#       - name: 📁 Get PNPM Store Directory
+#         shell: bash
+#         run: |
+#           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+#       - name: 💾 Setup PNPM Cache
+#         uses: actions/cache@v3
+#         with:
+#           path: ${{ env.STORE_PATH }}
+#           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+#           restore-keys: |
+#             ${{ runner.os }}-pnpm-store-
 
       - name: 🔨 Build Project
         run: |
-          npm ci
-          npm run build
+          pnpm install
+          pnpm build
 
       - name: 🚀 Deploy
         uses: JamesIves/github-pages-deploy-action@v4
