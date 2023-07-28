@@ -2,7 +2,7 @@
 //  LoadShaders.js
 //
 
-function initShaders( gl, vertexShaderId, fragmentShaderId )
+export default function initShaders( gl, vertexShaderId, fragmentShaderId )
 {
     var vertShdr;
     var fragShdr;

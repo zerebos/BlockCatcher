@@ -45,7 +45,7 @@
  * loop like this.
  *
  *       function render() {
- *         window.requestAnimFrame(render, canvas);
+ *         window.requestAnimationFrame(render, canvas);
  *
  *         // do rendering
  *         ...
@@ -57,7 +57,7 @@
  * visible.
  */
 
-WebGLUtils = function() {
+export default (function WebGLUtils() {
 
 /**
  * Creates the HTLM for a failure message
@@ -145,20 +145,6 @@ return {
   create3DContext: create3DContext,
   setupWebGL: setupWebGL
 };
-}();
-
-/**
- * Provides requestAnimationFrame in a cross browser way.
- */
-window.requestAnimFrame = (function() {
-  return window.requestAnimationFrame ||
-         window.webkitRequestAnimationFrame ||
-         window.mozRequestAnimationFrame ||
-         window.oRequestAnimationFrame ||
-         window.msRequestAnimationFrame ||
-         function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-           window.setTimeout(callback, 1000/60);
-         };
 })();
 
 

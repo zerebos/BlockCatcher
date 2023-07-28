@@ -1,14 +1,9 @@
-/*
-
-Created by:
-Zack Rauen
-
-*/
+import {vec2, flatten} from "./utils/MV";
 
 const playerVShaderID = "vertexShader";
 const playerFShaderID = "green";
 
-class Player {
+export default class Player {
     constructor(webgl) {
         this.webgl = webgl;
         this.points = [vec2(-.15, -.925), vec2(.15, -.925), vec2(.15,-.975), vec2(-.15,-.975)];
@@ -56,7 +51,7 @@ class Player {
         if (this.points[this.leftTopMax][0] + change >= -1.01 && this.points[this.rightBottomMax][0] + change < 1.01) {
             this.shiftX += change;
             for (var i = 0; i < this.points.length;i++) {
-            this.points[i][0] = this.points[i][0] + change;
+                this.points[i][0] = this.points[i][0] + change;
             }
         }
     }
