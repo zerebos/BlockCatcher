@@ -4,9 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "webpack --progress --color",
-    "build-prod": "webpack --mode production --no-devtool",
-    "watch": "webpack --progress --color --watch",
+    "build": "webpack --mode production --no-devtool",
     "dev": "webpack serve --progress --color",
     "lint": "eslint --ext .jsx,.js src/",
     "test": "echo \"Error: no test specified\" && exit 1"

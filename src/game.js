@@ -3,9 +3,10 @@ import Block from "./block";
 import "./styles/index.css";
 
 
-const SCORE_THRESHOLD = process.env.PRODUCTION ? 500 : 1;
-const MAX_SECONDS = process.env.PRODUCTION ? 60 : 10;
+const SCORE_THRESHOLD = process.env.PROD ? 500 : 1;
+const MAX_SECONDS = process.env.PROD ? 60 : 10;
 
+/** @type {Player} */
 let player;
 const blocks = [];
 
@@ -67,19 +68,19 @@ export default new class Game {
         }
         else if (keyCode == 37) { // LEFT
             event.preventDefault();
-            keyArray[keyEnum.LEFT] = true;
+            keyArray[keyEnum.LEFT] = true && gameStarted;
         }
         else if (keyCode == 38) { // UP
             event.preventDefault();
-            keyArray[keyEnum.UP] = true;
+            keyArray[keyEnum.UP] = true && gameStarted;
         }
         else if (keyCode == 39) { // RIGHT
             event.preventDefault();
-            keyArray[keyEnum.RIGHT] = true;
+            keyArray[keyEnum.RIGHT] = true && gameStarted;
         }
         else if (keyCode == 40) { // DOWN
             event.preventDefault();
-            keyArray[keyEnum.DOWN] = true;
+            keyArray[keyEnum.DOWN] = true && gameStarted;
         }
     }
 
