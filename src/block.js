@@ -41,19 +41,19 @@ export default class Block {
         this.shiftY = 0;
         this.deltaTrans = 0.010 * this.blockData.speed;
         this.buffer = this.webgl.createBuffer();
-        this.webgl.bindBuffer( this.webgl.ARRAY_BUFFER, this.buffer );
-        this.webgl.bufferData( this.webgl.ARRAY_BUFFER,	flatten(this.points), this.webgl.STATIC_DRAW );
+        this.webgl.bindBuffer(this.webgl.ARRAY_BUFFER, this.buffer);
+        this.webgl.bufferData(this.webgl.ARRAY_BUFFER, flatten(this.points), this.webgl.STATIC_DRAW);
         
         this.attachShaders();
     }
 
     attachShaders() {
-        var vertexShader = this.webgl.createShader(this.webgl.VERTEX_SHADER);
+        const vertexShader = this.webgl.createShader(this.webgl.VERTEX_SHADER);
         this.webgl.shaderSource(vertexShader, document.getElementById(BlockVShaderID).text);
         this.webgl.compileShader(vertexShader);
         
-        var fragShader = this.webgl.createShader(this.webgl.FRAGMENT_SHADER);
-        this.webgl.shaderSource(fragShader, document.getElementById(this.blockData.color).text );
+        const fragShader = this.webgl.createShader(this.webgl.FRAGMENT_SHADER);
+        this.webgl.shaderSource(fragShader, document.getElementById(this.blockData.color).text);
         this.webgl.compileShader(fragShader);
         
         this.shaderProgram = this.webgl.createProgram();
@@ -63,41 +63,39 @@ export default class Block {
     }
 
     attachVariables() {
-        var myPosition = this.webgl.getAttribLocation(this.shaderProgram, "myPosition");
-        this.webgl.vertexAttribPointer( myPosition, 2, this.webgl.FLOAT, false, 0, 0 );
-        this.webgl.enableVertexAttribArray( myPosition );
+        const myPosition = this.webgl.getAttribLocation(this.shaderProgram, "myPosition");
+        this.webgl.vertexAttribPointer(myPosition, 2, this.webgl.FLOAT, false, 0, 0);
+        this.webgl.enableVertexAttribArray(myPosition);
         
         this.xshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"xshift");
         this.yshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"yshift");
     }
 
     moveX(forward) {
-        var change = forward ? this.deltaTrans : -this.deltaTrans;
+        const change = forward ? this.deltaTrans : -this.deltaTrans;
         if (this.points[this.leftTopMax][0] + change >= -1.01 && this.points[this.rightBottomMax][0] + change < 1.01) {
             this.shiftX += change;
-            for (var i = 0; i < this.points.length;i++) {
-            this.points[i][0] = this.points[i][0] + change;
+            for (let i = 0; i < this.points.length; i++) {
+                this.points[i][0] = this.points[i][0] + change;
             }
         }
     }
 
     moveY(forward, timediff) {
-        var change = forward ? this.deltaTrans : -this.deltaTrans;
+        let change = forward ? this.deltaTrans : -this.deltaTrans;
         change *= timediff / 25;
-        //console.log(change);
         this.shiftY += change;
-        for (var i = 0; i < this.points.length;i++) {
+        for (let i = 0; i < this.points.length; i++) {
             this.points[i][1] = this.points[i][1] + change;
         }
     }
 
     render(timediff) {
         this.webgl.useProgram(this.shaderProgram);
-        this.webgl.bindBuffer( this.webgl.ARRAY_BUFFER, this.buffer );
+        this.webgl.bindBuffer(this.webgl.ARRAY_BUFFER, this.buffer);
         this.attachVariables();
         this.moveY(false, timediff);
         this.webgl.uniform1f(this.yshiftLoc,this.shiftY);
         this.webgl.drawArrays(this.webgl.TRIANGLE_FAN, 0, this.points.length);
-        //window.requestAnimationFrame(this.render);
     }
 }
