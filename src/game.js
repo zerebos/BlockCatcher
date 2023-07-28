@@ -1,9 +1,10 @@
 import Player from "./player";
 import Block from "./block";
-import WebGLUtils from "./utils/webgl-utils";
 
 let player;
 const blocks = [];
+
+/** @type {WebGLRenderingContext} */
 let gl;
 
 const keyEnum = {UP: 0, DOWN: 1, LEFT: 2, RIGHT: 3};
@@ -25,8 +26,9 @@ window.game = new class Game {
         statusDisplay = document.getElementById("status");
         playDisplay = document.getElementById("play");
         
+        /** @type {HTMLCanvasElement} */
         const canvas = document.getElementById("gl-canvas");
-        gl = WebGLUtils.setupWebGL(canvas);
+        gl = canvas.getContext("webgl");
         if (!gl) alert("WebGL is not available");
         
         gl.viewport(0, 0, 512, 512); // set size of viewport
