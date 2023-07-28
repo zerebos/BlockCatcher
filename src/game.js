@@ -1,5 +1,6 @@
 import Player from "./player";
 import Block from "./block";
+import "./styles/base.css";
 
 let player;
 const blocks = [];
@@ -20,6 +21,20 @@ let lastFrame = performance.now();
 let gameTimer;
 
 window.game = new class Game {
+    constructor() {
+        this.render = this.render.bind(this);
+        this.spawnBlocks = this.spawnBlocks.bind(this);
+        this.keyDown = this.keyDown.bind(this);
+        this.keyUp = this.keyUp.bind(this);
+        this.startTimer = this.startTimer.bind(this);
+        this.startGame = this.startGame.bind(this);
+        this.initialize = this.initialize.bind(this);
+
+        document.addEventListener("DOMContentLoaded", this.initialize);
+        document.addEventListener("keyup", this.keyUp);
+        document.addEventListener("keydown", this.keyDown);
+    }
+
     initialize() {
         display = document.getElementById("time");
         scoreDisplay = document.getElementById("score");
@@ -38,13 +53,6 @@ window.game = new class Game {
         const timestep = lastFrame;
         player = new Player(gl); // create new player
         player.render(false, false, 0);
-    
-        this.render = this.render.bind(this);
-        this.spawnBlocks = this.spawnBlocks.bind(this);
-        this.keyDown = this.keyDown.bind(this);
-        this.keyUp = this.keyUp.bind(this);
-        this.startTimer = this.startTimer.bind(this);
-        this.startGame = this.startGame.bind(this);
 
         this.render(timestep);
     }

@@ -1,7 +1,10 @@
-import {vec2, flatten} from "./utils/MV";
+import {vec2} from "./utils/vectors";
+import vertexShaderSource from "./shaders/main.vert";
+import fragmentShaderSource from "./shaders/main.frag";
 
-const playerVShaderID = "vertexShader";
-const playerFShaderID = "green";
+
+const PLAYER_COLOR = [0, 1, 0];
+
 
 export default class Player {
     constructor(webgl) {
@@ -14,7 +17,7 @@ export default class Player {
         this.deltaTrans = 0.03;
         this.buffer = this.webgl.createBuffer();
         this.webgl.bindBuffer(this.webgl.ARRAY_BUFFER, this.buffer);
-        this.webgl.bufferData(this.webgl.ARRAY_BUFFER, flatten(this.points), this.webgl.STATIC_DRAW);
+        this.webgl.bufferData(this.webgl.ARRAY_BUFFER, Float32Array.from(this.points.flat()), this.webgl.STATIC_DRAW);
         this.velocity = 0;
         
         this.attachShaders();
@@ -22,11 +25,11 @@ export default class Player {
 
     attachShaders() {
         const vertexShader = this.webgl.createShader(this.webgl.VERTEX_SHADER);
-        this.webgl.shaderSource(vertexShader, document.getElementById(playerVShaderID).text);
+        this.webgl.shaderSource(vertexShader, vertexShaderSource);
         this.webgl.compileShader(vertexShader);
         
         const fragShader = this.webgl.createShader(this.webgl.FRAGMENT_SHADER);
-        this.webgl.shaderSource(fragShader, document.getElementById(playerFShaderID).text);
+        this.webgl.shaderSource(fragShader, fragmentShaderSource);
         this.webgl.compileShader(fragShader);
         
         this.shaderProgram = this.webgl.createProgram();
@@ -43,6 +46,9 @@ export default class Player {
         this.xshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"xshift");
         this.webgl.uniform1f(this.xshiftLoc,this.shiftX);
         this.yshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"yshift");
+
+        this.colorLocation = this.webgl.getUniformLocation(this.shaderProgram, "u_color");
+        this.webgl.uniform4f(this.colorLocation, ...PLAYER_COLOR, 1);
     }
 
     moveX(forward, timestep) {

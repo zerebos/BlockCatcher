@@ -1,22 +1,22 @@
-import {vec2, flatten} from "./utils/MV";
-
-const BlockVShaderID = "vertexShader";
+import {vec2} from "./utils/vectors";
+import vertexShaderSource from "./shaders/main.vert";
+import fragmentShaderSource from "./shaders/main.frag";
 
 const BlockData = {
     red: {
-        color: "red",
+        color: [1, 0, 0],
         speed: 1,
         size: 2.5,
         points: 1
     },
     blue: {
-        color: "blue",
+        color: [0, 0, 1],
         speed: 2,
         size: 1.5,
         points: 5
     },
     white: {
-        color: "white",
+        color: [1, 1, 1],
         speed: 3,
         size: 1,
         points: 25
@@ -42,18 +42,18 @@ export default class Block {
         this.deltaTrans = 0.010 * this.blockData.speed;
         this.buffer = this.webgl.createBuffer();
         this.webgl.bindBuffer(this.webgl.ARRAY_BUFFER, this.buffer);
-        this.webgl.bufferData(this.webgl.ARRAY_BUFFER, flatten(this.points), this.webgl.STATIC_DRAW);
-        
+        this.webgl.bufferData(this.webgl.ARRAY_BUFFER, Float32Array.from(this.points.flat()), this.webgl.STATIC_DRAW);
+
         this.attachShaders();
     }
 
     attachShaders() {
         const vertexShader = this.webgl.createShader(this.webgl.VERTEX_SHADER);
-        this.webgl.shaderSource(vertexShader, document.getElementById(BlockVShaderID).text);
+        this.webgl.shaderSource(vertexShader, vertexShaderSource);
         this.webgl.compileShader(vertexShader);
         
         const fragShader = this.webgl.createShader(this.webgl.FRAGMENT_SHADER);
-        this.webgl.shaderSource(fragShader, document.getElementById(this.blockData.color).text);
+        this.webgl.shaderSource(fragShader, fragmentShaderSource);
         this.webgl.compileShader(fragShader);
         
         this.shaderProgram = this.webgl.createProgram();
@@ -69,6 +69,9 @@ export default class Block {
         
         this.xshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"xshift");
         this.yshiftLoc = this.webgl.getUniformLocation(this.shaderProgram,"yshift");
+
+        this.colorLocation = this.webgl.getUniformLocation(this.shaderProgram, "u_color");
+        this.webgl.uniform4f(this.colorLocation, ...this.blockData.color, 1);
     }
 
     moveX(forward) {
