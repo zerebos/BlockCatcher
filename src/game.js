@@ -1,20 +1,16 @@
+import Renderer from "./utils/renderer";
 import Player from "./player";
 import Block from "./block";
+import Keyboard from "./utils/keyboard";
+import {SCORE_THRESHOLD, MAX_SECONDS} from "./config";
 import "./styles/index.css";
 
-
-const SCORE_THRESHOLD = process.env.PROD ? 500 : 1;
-const MAX_SECONDS = process.env.PROD ? 60 : 10;
 
 /** @type {Player} */
 let player;
 const blocks = [];
 
-/** @type {WebGLRenderingContext} */
-let gl;
 
-const keyEnum = {UP: 0, DOWN: 1, LEFT: 2, RIGHT: 3};
-const keyArray = new Array(4);
 
 let display, scoreDisplay, statusDisplay, playDisplay;
 
@@ -25,17 +21,15 @@ let gameTimer;
 
 export default new class Game {
     constructor() {
-        this.render = this.render.bind(this);
+        this.tick = this.tick.bind(this);
         this.spawnBlocks = this.spawnBlocks.bind(this);
-        this.keyDown = this.keyDown.bind(this);
-        this.keyUp = this.keyUp.bind(this);
         this.startTimer = this.startTimer.bind(this);
         this.startGame = this.startGame.bind(this);
         this.initialize = this.initialize.bind(this);
 
         document.addEventListener("DOMContentLoaded", this.initialize);
-        document.addEventListener("keyup", this.keyUp);
-        document.addEventListener("keydown", this.keyDown);
+        Keyboard.subscribe(" ", this.startGame);
+        Keyboard.trackKeys("ArrowLeft", "ArrowRight");
     }
 
     initialize() {
@@ -46,89 +40,52 @@ export default new class Game {
         
         /** @type {HTMLCanvasElement} */
         const canvas = document.getElementById("gl-canvas");
-        gl = canvas.getContext("webgl");
-        if (!gl) alert("WebGL is not available");
+
+        /** @type {WebGLRenderingContext} */
+        this.gl = canvas.getContext("webgl");
+        if (!this.gl) alert("WebGL is not available");
+
+        this.renderer = new Renderer(this.gl);
         
-        gl.viewport(0, 0, 512, 512); // set size of viewport
-        gl.clearColor(0.0, 0.0, 0.0, 1.0); // background black
-        gl.clear(gl.COLOR_BUFFER_BIT); // allows color
+        this.gl.viewport(0, 0, 512, 512); // set size of viewport
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0); // background black
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT); // allows color
         
         const timestep = lastFrame;
-        player = new Player(gl); // create new player
-        player.render(false, false, 0);
+        player = new Player(this.gl); // create new player
 
-        this.render(timestep);
+        this.tick(timestep);
     }
 
-    keyDown(event) {
-        const keyCode = event.keyCode;
-    
-        if (keyCode == 32) { // SPACE
-            event.preventDefault();
-        }
-        else if (keyCode == 37) { // LEFT
-            event.preventDefault();
-            keyArray[keyEnum.LEFT] = true && gameStarted;
-        }
-        else if (keyCode == 38) { // UP
-            event.preventDefault();
-            keyArray[keyEnum.UP] = true && gameStarted;
-        }
-        else if (keyCode == 39) { // RIGHT
-            event.preventDefault();
-            keyArray[keyEnum.RIGHT] = true && gameStarted;
-        }
-        else if (keyCode == 40) { // DOWN
-            event.preventDefault();
-            keyArray[keyEnum.DOWN] = true && gameStarted;
-        }
-    }
-
-    keyUp(event) {
-        const keyCode = event.keyCode;
-        if (keyCode == 32) { // SPACE
-            event.preventDefault();
-            this.startGame();
-        }
-        else if (keyCode == 37) { // LEFT
-            event.preventDefault();
-            keyArray[keyEnum.LEFT] = false;
-        }
-        else if (keyCode == 38) { // UP
-            event.preventDefault();
-            keyArray[keyEnum.UP] = false;
-        }
-        else if (keyCode == 39) { // RIGHT
-            event.preventDefault();
-            keyArray[keyEnum.RIGHT] = false;
-        }
-        else if (keyCode == 40) { // DOWN
-            event.preventDefault();
-            keyArray[keyEnum.DOWN] = false;
-        }
-    }
-
-    render(frameStart) {
+    tick(frameStart) {
+        // Tick the game
         const timestep = frameStart - lastFrame;
         lastFrame = frameStart;
-        gl.clear(gl.COLOR_BUFFER_BIT); // allows color
-        player.render(keyArray[keyEnum.LEFT], keyArray[keyEnum.RIGHT], timestep);
+        const playerDirection = Keyboard.state.ArrowLeft ? -1 : Keyboard.state.ArrowRight ? 1 : 0;
+        player.step(timestep, !gameStarted ? 0 : playerDirection);
+        
         for (let i = 0; i < blocks.length; i++) {
-            blocks[i].render(timestep);
-            if (blocks[i].points[blocks[i].rightBottomMax][1] <= player.points[player.leftTopMax][1] && blocks[i].points[blocks[i].leftTopMax][1] >= player.points[player.rightBottomMax][1]
-                && blocks[i].points[blocks[i].rightBottomMax][0] >= player.points[player.leftTopMax][0] && blocks[i].points[blocks[i].leftTopMax][0] <= player.points[player.rightBottomMax][0]) {
+            blocks[i].step(timestep);
+            
+            if (player.collides(blocks[i])) {
                 score += blocks[i].blockData.points;
                 scoreDisplay.textContent = score;
-                blocks.splice(i,1);
+                blocks.splice(i, 1);
                 i--;
             }
-            else if (blocks[i].points[blocks[i].leftTopMax][1] <= -1.0) {
-                blocks.splice(i,1);
+            else if (blocks[i].y <= -1.0) {
+                blocks.splice(i, 1);
                 i--;
             }
         }
-        // console.log(performance.now())
-        window.requestAnimationFrame(this.render);
+
+        // Redraw everything
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT); // allows color
+        this.renderer.draw(player);
+        for (let i = 0; i < blocks.length; i++) this.renderer.draw(blocks[i]);
+        
+        // Call for next tick
+        window.requestAnimationFrame(this.tick);
     }
 
     startTimer(duration, timeDisplay) {
@@ -168,7 +125,7 @@ export default new class Game {
 
     spawnBlocks(timer) {
         if (timer != 0) {
-            blocks.push(new Block(gl));
+            blocks.push(new Block(this.gl));
         }
         else {
             blocks.splice(0,blocks.length);
