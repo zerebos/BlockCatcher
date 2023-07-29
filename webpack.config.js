@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const isProduction = process.argv.some(a => a === "production");
 
 /* eslint-disable quote-props */
@@ -30,6 +31,12 @@ module.exports = {
         ]
     },
     plugins: [
+        new CopyWebpackPlugin({patterns: [
+            {
+                from: "assets",
+                to: "assets"
+            }
+        ]}),
         new HtmlWebpackPlugin({
             template: "src/index.html"
         }),
@@ -38,9 +45,7 @@ module.exports = {
         }),
     ],
     devServer: {
-        static: {
-            directory: path.join(__dirname, "public"),
-        },
+        static: [path.join(__dirname, "assets")],
         compress: true,
         port: 9000,
     }
