@@ -2,30 +2,25 @@ import Renderer from "./utils/renderer";
 import Player from "./player";
 import Block from "./block";
 import Keyboard from "./utils/keyboard";
+import HUD from "./hud";
 import {SCORE_THRESHOLD, MAX_SECONDS} from "./config";
 import "./styles/index.css";
 
 
-/** @type {Player} */
-let player;
-const blocks = [];
-
-
-
-let display, scoreDisplay, statusDisplay, playDisplay;
-
-let score = 0;
-let gameStarted = false;
-let lastFrame = performance.now();
-let gameTimer;
-
 export default new class Game {
     constructor() {
         this.tick = this.tick.bind(this);
-        this.spawnBlocks = this.spawnBlocks.bind(this);
+        this.processTimer = this.processTimer.bind(this);
         this.startTimer = this.startTimer.bind(this);
         this.startGame = this.startGame.bind(this);
         this.initialize = this.initialize.bind(this);
+
+        this.state = {
+            score: 0,
+            started: false,
+            timeLeft: MAX_SECONDS,
+            lastFrame: performance.now(),
+        };
 
         document.addEventListener("DOMContentLoaded", this.initialize);
         Keyboard.subscribe(" ", this.startGame);
@@ -33,115 +28,83 @@ export default new class Game {
     }
 
     initialize() {
-        display = document.getElementById("time");
-        scoreDisplay = document.getElementById("score");
-        statusDisplay = document.getElementById("status");
-        playDisplay = document.getElementById("play");
-        
-        /** @type {HTMLCanvasElement} */
-        const canvas = document.getElementById("gl-canvas");
+        /** @type {HUD} */
+        this.HUD = new HUD(MAX_SECONDS);
 
-        /** @type {WebGLRenderingContext} */
-        this.gl = canvas.getContext("webgl");
-        if (!this.gl) alert("WebGL is not available");
+        /** @type {Renderer} */
+        this.renderer = new Renderer(document.getElementById("gl-canvas"));
 
-        this.renderer = new Renderer(this.gl);
-        
-        this.gl.viewport(0, 0, 512, 512); // set size of viewport
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0); // background black
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT); // allows color
-        
-        const timestep = lastFrame;
-        player = new Player(this.gl); // create new player
+        /** @type {Player} */
+        this.player = new Player(this.renderer); // create new player
 
-        this.tick(timestep);
+        /** @type {Block[]} */
+        this.blocks = [];
+
+        this.tick(performance.now()); // initial paint
     }
 
     tick(frameStart) {
         // Tick the game
-        const timestep = frameStart - lastFrame;
-        lastFrame = frameStart;
+        const timestep = frameStart - this.state.lastFrame;
+        this.state.lastFrame = frameStart;
         const playerDirection = Keyboard.state.ArrowLeft ? -1 : Keyboard.state.ArrowRight ? 1 : 0;
-        player.step(timestep, !gameStarted ? 0 : playerDirection);
+        this.player.step(timestep, !this.state.started ? 0 : playerDirection);
         
-        for (let i = 0; i < blocks.length; i++) {
-            blocks[i].step(timestep);
+        for (let i = 0; i < this.blocks.length; i++) {
+            this.blocks[i].step(timestep);
             
-            if (player.collides(blocks[i])) {
-                score += blocks[i].blockData.points;
-                scoreDisplay.textContent = score;
-                blocks.splice(i, 1);
+            if (this.player.collides(this.blocks[i])) {
+                this.addScore(this.blocks[i].blockData.points);
+                this.blocks.splice(i, 1);
                 i--;
             }
-            else if (blocks[i].y <= -1.0) {
-                blocks.splice(i, 1);
+            else if (this.blocks[i].y <= -1.0) {
+                this.blocks.splice(i, 1);
                 i--;
             }
         }
 
         // Redraw everything
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT); // allows color
-        this.renderer.draw(player);
-        for (let i = 0; i < blocks.length; i++) this.renderer.draw(blocks[i]);
+        this.renderer.clearColorBuffer();
+        this.renderer.draw(this.player);
+        for (let i = 0; i < this.blocks.length; i++) this.renderer.draw(this.blocks[i]);
         
         // Call for next tick
         window.requestAnimationFrame(this.tick);
     }
 
-    startTimer(duration, timeDisplay) {
-        let timer = duration, minutes, seconds;
-        gameTimer = setInterval(() => {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
-    
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-    
-            timeDisplay.textContent = minutes + ":" + seconds;
-            
-            // console.log(this);
-            this.spawnBlocks(timer);
-    
-            if (--timer < 0) {
-                timer = 0;
-            }
+    startGame() {
+        if (this.state.started) return;
+        this.state.started = true;
+        this.state.score = 0;
+        this.HUD.startGame();
+        this.startTimer();
+    }
+
+    addScore(toAdd) {
+        this.state.score = this.state.score + toAdd;
+        this.HUD.updateScore(this.state.score);
+    }
+
+    endGame() {
+        if (!this.state.started) return;
+        this.state.started = false;
+        clearInterval(this.timer);
+        this.HUD.gameOver(this.state.score >= SCORE_THRESHOLD);
+        this.blocks.splice(0, this.blocks.length);
+    }
+
+    startTimer() {
+        this.state.timeLeft = MAX_SECONDS;
+        this.timer = setInterval(() => {
+            if (--this.state.timeLeft < 0) this.state.timeLeft = 0;
+            this.HUD.updateTime(this.state.timeLeft);
+            this.processTimer(this.state.timeLeft);
         }, 1000);
     }
 
-    startGame() {
-        if (gameStarted == false) {
-            gameStarted = true;
-            score = 0;
-            scoreDisplay.textContent = score;
-            // statusDisplay.textContent = "Playing...";
-            // statusDisplay.style.color = "gray";
-            statusDisplay.classList.remove("win");
-            statusDisplay.classList.remove("loss");
-            // playDisplay.textContent = "";
-            playDisplay.parentElement.style.opacity = 0;
-            this.startTimer(MAX_SECONDS, display);
-        }
-    }
-
-    spawnBlocks(timer) {
-        if (timer != 0) {
-            blocks.push(new Block(this.gl));
-        }
-        else {
-            blocks.splice(0,blocks.length);
-            clearInterval(gameTimer);
-            display.textContent = "01:00";
-            gameStarted = false;
-            if (score >= SCORE_THRESHOLD) {
-                statusDisplay.textContent = "YOU WON!";
-                statusDisplay.classList.add("win");
-            }
-            else {
-                statusDisplay.textContent = "YOU LOST!";
-                statusDisplay.classList.add("loss");
-            }
-            playDisplay.parentElement.style.opacity = "";
-            playDisplay.textContent = "Press SPACE to play again!";
-        }
+    processTimer(timeRemaining) {
+        if (!timeRemaining) return this.endGame();
+        this.blocks.push(new Block(this.renderer));
     }
 };

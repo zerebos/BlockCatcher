@@ -6,8 +6,8 @@ export default class Rectangle {
 
     get topLeft() {return this.points[0];}
     get topRight() {return this.points[1];}
-    get bottomLeft() {return this.points[2];}
-    get bottomRight() {return this.points[3];}
+    get bottomRight() {return this.points[2];}
+    get bottomLeft() {return this.points[3];}
 
     get x() {return this.topLeft[0];}
     get y() {return this.topLeft[1];}

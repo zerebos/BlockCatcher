@@ -1,10 +1,17 @@
 import vertexShaderSource from "../shaders/main.vert";
 import fragmentShaderSource from "../shaders/main.frag";
+import {BG_COLOR} from "../config";
 
 
 export default class Renderer {
-    constructor(webgl) {
-        this.webgl = webgl;
+    constructor(canvas) {
+        /** @type {WebGLRenderingContext} */
+        this.webgl = canvas.getContext("webgl");
+        if (!this.webgl) return alert("WebGL is not available");
+
+        this.webgl.viewport(0, 0, 512, 512); // set size of viewport
+        this.webgl.clearColor(...BG_COLOR, 1.0); // background black
+        this.webgl.clear(this.webgl.COLOR_BUFFER_BIT); // allows color
 
         this.vertexShader = this.webgl.createShader(this.webgl.VERTEX_SHADER);
         this.webgl.shaderSource(this.vertexShader, vertexShaderSource);
@@ -28,6 +35,17 @@ export default class Renderer {
         this.yshiftLocation = this.webgl.getUniformLocation(this.shaderProgram, "yshift");
 
         this.colorLocation = this.webgl.getUniformLocation(this.shaderProgram, "u_color");
+    }
+
+    createBuffer(points) {
+        const buffer = this.webgl.createBuffer();
+        this.webgl.bindBuffer(this.webgl.ARRAY_BUFFER, buffer);
+        this.webgl.bufferData(this.webgl.ARRAY_BUFFER, Float32Array.from(points.flat()), this.webgl.STATIC_DRAW);
+        return buffer;
+    }
+
+    clearColorBuffer() {
+        this.webgl.clear(this.webgl.COLOR_BUFFER_BIT);
     }
 
     draw(obj) {

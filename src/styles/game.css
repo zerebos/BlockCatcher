@@ -4,9 +4,17 @@
 }
 
 #hud {
-    background-color: black;
+    position: absolute;
+    left: 0;
+    right: 0;
     justify-content: space-between;
     padding: 10px 20px;
+    z-index: 1;
+    font-weight: 600;
+}
+
+#hud span[id] {
+    color: #00FF00;
 }
 
 #canvas-wrap {
@@ -24,6 +32,10 @@
     opacity: 1;
 }
 
+.overlay.hide {
+    opacity: 0;
+}
+
 .overlay span {
     display: flex;
     justify-content: center;
@@ -36,9 +48,9 @@
 }
 
 #status.loss {
-    color: red;
+    color: #FF0000;
 }
 
 #status.win {
-    color: green;
+    color: #00FF00;
 }

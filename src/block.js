@@ -6,7 +6,7 @@ import {BLOCKS} from "./config";
 
 const minSize = 0.1;
 export default class Block extends Rectangle {
-    constructor(webgl) {
+    constructor(renderer) {
         const blockID = Math.floor((Math.random() * BLOCKS.length));
         const blockData = BLOCKS[blockID];
         const startX = (Math.random() * (1 - (minSize * blockData.size) + 1)) - 1;
@@ -22,9 +22,7 @@ export default class Block extends Rectangle {
 
         this.shiftY = 0;
         this.deltaTrans = 0.010 * this.blockData.speed;
-        this.buffer = webgl.createBuffer();
-        webgl.bindBuffer(webgl.ARRAY_BUFFER, this.buffer);
-        webgl.bufferData(webgl.ARRAY_BUFFER, Float32Array.from(this.points.flat()), webgl.STATIC_DRAW);
+        this.buffer = renderer.createBuffer(this.points);
     }
 
     get uniforms() {

@@ -5,7 +5,7 @@ import {PLAYER_COLOR} from "./config";
 
 
 export default class Player extends Rectangle {
-    constructor(webgl) {
+    constructor(renderer) {
         super([
             vec2(-0.15, -0.925),
             vec2(0.15, -0.925),
@@ -16,9 +16,7 @@ export default class Player extends Rectangle {
         this.velocity = 0;
         this.shiftX = 0;
         this.deltaTrans = 0.03;
-        this.buffer = webgl.createBuffer();
-        webgl.bindBuffer(webgl.ARRAY_BUFFER, this.buffer);
-        webgl.bufferData(webgl.ARRAY_BUFFER, Float32Array.from(this.points.flat()), webgl.STATIC_DRAW);
+        this.buffer = renderer.createBuffer(this.points);
     }
 
     get uniforms() {
@@ -32,7 +30,7 @@ export default class Player extends Rectangle {
     step(timestep, direction) {
         let change = direction * this.deltaTrans;
         change *= timestep / 25;
-        if (this.x + change >= -1.01 && this.bottomRight[0] + change < 1.01) {
+        if (this.topLeft[0] + change >= -1.01 && this.bottomRight[0] + change < 1.01) {
             this.shiftX += change;
             for (let i = 0; i < this.points.length; i++) {
                 this.points[i][0] = this.points[i][0] + change;
