@@ -1,31 +1,38 @@
 export const TICK = 0;
 export const DONE = 1;
 
+type TimerListener = (event: number) => void;
+
 // In case we need a more advanced timer for the game with a cleaner api
 export default class Timer {
-    constructor(initialTime, timeInterval) {
+    running: boolean = false;
+    listeners: Set<TimerListener> = new Set();
+
+    interval: number;
+    timeLeft: number;
+    timer?: number;
+
+    constructor(initialTime: number, timeInterval: number) {
         if (initialTime % timeInterval != 0) throw new Error("Time must divide evenly");
-        this.running = false;
         this.timeLeft = initialTime;
         this.interval = timeInterval;
-        this.listeners = new Set();
     }
 
-    addListener(listener) {
+    addListener(listener: TimerListener) {
         this.listeners.add(listener);
     }
 
-    setTime(newTime) {
+    setTime(newTime: number) {
         if (newTime % this.interval != 0) throw new Error("New time does not divide evenly by interval");
         this.timeLeft = newTime;
     }
 
-    addTime(additionalTime) {
+    addTime(additionalTime: number) {
         if (this.timeLeft + additionalTime % this.interval != 0) throw new Error("New time does not divide evenly by interval");
         this.timeLeft += additionalTime;
     }
 
-    setInterval(newInterval) {
+    setInterval(newInterval: number) {
         if (this.timeLeft % newInterval != 0) throw new Error("New interval does not divide time evenly");
         this.interval = newInterval;
     }
@@ -52,4 +59,3 @@ export default class Timer {
         }
     }
 }
-  

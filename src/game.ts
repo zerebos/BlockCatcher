@@ -7,6 +7,19 @@ import {SCORE_THRESHOLD, MAX_SECONDS} from "./config";
 
 
 export default new class Game {
+
+    HUD!: HUD;
+    renderer!: Renderer;
+    player!: Player;
+    blocks!: Block[];
+    timer?: number;
+    state: {
+        score: number;
+        started: boolean;
+        timeLeft: number;
+        lastFrame: number;
+    };
+
     constructor() {
         this.tick = this.tick.bind(this);
         this.processTimer = this.processTimer.bind(this);
@@ -31,7 +44,7 @@ export default new class Game {
         this.HUD = new HUD(MAX_SECONDS);
 
         /** @type {Renderer} */
-        this.renderer = new Renderer(document.getElementById("gl-canvas"));
+        this.renderer = new Renderer(document.getElementById("gl-canvas") as HTMLCanvasElement); // create new renderer
 
         /** @type {Player} */
         this.player = new Player(this.renderer); // create new player
@@ -42,7 +55,7 @@ export default new class Game {
         this.tick(performance.now()); // initial paint
     }
 
-    tick(frameStart) {
+    tick(frameStart: number) {
         // Tick the game
         const timestep = frameStart - this.state.lastFrame;
         this.state.lastFrame = frameStart;
@@ -80,7 +93,7 @@ export default new class Game {
         this.startTimer();
     }
 
-    addScore(toAdd) {
+    addScore(toAdd: number) {
         this.state.score = this.state.score + toAdd;
         this.HUD.updateScore(this.state.score);
     }
@@ -102,7 +115,7 @@ export default new class Game {
         }, 1000);
     }
 
-    processTimer(timeRemaining) {
+    processTimer(timeRemaining: number) {
         if (!timeRemaining) return this.endGame();
         this.blocks.push(new Block(this.renderer));
     }

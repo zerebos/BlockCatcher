@@ -1,23 +1,23 @@
-const tracked = new Set();
-const trackedState = {};
-const subscriptions = {};
+const tracked = new Set<string>();
+const trackedState: Record<string, boolean> = {};
+const subscriptions: Record<string, Set<(event: KeyboardEvent) => void>> = {};
 
 
-function keyDown(event) {
+function keyDown(event: KeyboardEvent) {
     if (!tracked.has(event.key)) return;
     event.preventDefault();
     trackedState[event.key] = true;
 }
 
-/** @param {KeyboardEvent} event */
-function keyUp(event) {
+
+function keyUp(event: KeyboardEvent) {
     if (!tracked.has(event.key)) return;
     event.preventDefault();
     trackedState[event.key] = false;
 }
 
-/** @param {KeyboardEvent} event */
-function keyPress(event) {
+
+function keyPress(event: KeyboardEvent) {
     if (!(event.key in subscriptions)) return;
     event.preventDefault();
 
@@ -25,23 +25,24 @@ function keyPress(event) {
     for (const callback of set.values()) callback(event);
 }
 
+
 export default new class Keyboard {
     get state() {return trackedState;}
 
-    trackKeys(...keys) {
+    trackKeys(...keys: string[]) {
         for (const key of keys) tracked.add(key);
     }
 
-    untrackKeys(...keys) {
+    untrackKeys(...keys: string[]) {
         for (const key of keys) tracked.delete(key);
     }
 
-    subscribe(key, callback) {
+    subscribe(key: string, callback: (event: KeyboardEvent) => void) {
         if (!subscriptions[key]) subscriptions[key] = new Set();
         subscriptions[key].add(callback);
     }
 
-    unsubscribe(key, callback) {
+    unsubscribe(key: string, callback: (event: KeyboardEvent) => void) {
         if (!subscriptions[key]) subscriptions[key] = new Set();
         return subscriptions[key].delete(callback);
     }
