@@ -8,7 +8,7 @@
     "dev": "bun src/index.html",
     "prod": "bun run build && cp -R assets dist/assets",
     "lint": "eslint --ext .jsx,.js src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "bun test tests/"
   },
   "keywords": [],
   "author": "",
