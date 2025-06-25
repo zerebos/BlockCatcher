@@ -32,12 +32,12 @@ body {
     text-align: center;
 }
 
-h2, h4 {
+h1, h2, h4 {
     font-weight: bold;
     color: #00ff00;
 }
 
-h2 {
+h1, h2 {
     margin: 0;
 }
 
@@ -135,4 +135,53 @@ var.blue {
 var.white {
     background: #ddd;
     color: black;
+}
+
+/* Accessibility Styles */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus indicators for keyboard navigation */
+a:focus,
+canvas:focus,
+button:focus {
+    outline: 3px solid #00ff00;
+    outline-offset: 2px;
+}
+
+/* Enhanced focus for canvas */
+#gl-canvas:focus {
+    outline: 3px solid #00ff00;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.3);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .container {
+        border: 2px solid #fff;
+    }
+
+    h1, h2, h4 {
+        color: #ffffff;
+        text-shadow: 1px 1px 0 #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }

@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "bun build --minify src/index.html --outdir dist",
     "dev": "bun src/index.html",
     "prod": "bun run build && cp -R assets dist/assets",
-    "lint": "eslint --ext .jsx,.js src/",
+    "lint": "eslint --ext .ts src/",
     "test": "bun test tests/"
   },
   "keywords": [],

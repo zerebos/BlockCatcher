@@ -42,37 +42,63 @@
 
     <body>
         <div class="container">
-            <div id="forkongithub"><a href="https://github.com/zerebos/BlockCatcher">Find me on GitHub</a></div>
-            <h2 class="wide">Block Catcher</h2>
-            <iframe src="https://ghbtns.com/github-btn.html?user=zerebos&repo=BlockCatcher&type=star&count=true&size=large" frameborder="0" scrolling="0" width="120" height="30" title="GitHub"></iframe>
-            <div class="flex column" id="game-display">
+            <div id="forkongithub"><a href="https://github.com/zerebos/BlockCatcher" aria-label="View source code on GitHub">Find me on GitHub</a></div>
+            <h1 class="wide">Block Catcher</h1>
+            <iframe src="https://ghbtns.com/github-btn.html?user=zerebos&repo=BlockCatcher&type=star&count=true&size=large" frameborder="0" scrolling="0" width="120" height="30" title="GitHub star button for BlockCatcher repository"></iframe>
+
+            <div class="flex column" id="game-display" role="main" aria-labelledby="game-title">
+                <h2 id="game-title" class="sr-only">Block Catcher Game</h2>
+
                 <div class="flex" id="canvas-wrap">
-                    <div class="flex flex-space-evenly" id="hud"><span>Points: <span id="score">0</span></span><span>Time: <span id="time">01:00</span></span></div>
-                    <canvas id="gl-canvas" width="512" height="512"></canvas>
-                    <div class="flex column flex-justify-center overlay"><span id="status"></span><span id="play">Press SPACE to play!</span></div>
+                    <div class="flex flex-space-evenly" id="hud" role="status" aria-live="polite" aria-label="Game statistics">
+                        <span>Points: <span id="score" aria-label="Current score">0</span></span>
+                        <span>Time: <span id="time" aria-label="Time remaining">01:00</span></span>
+                    </div>
+
+                    <canvas id="gl-canvas"
+                            width="512"
+                            height="512"
+                            role="application"
+                            aria-label="Block Catcher game canvas. Use left and right arrow keys to move the player bar and catch falling blocks. Press space to start."
+                            tabindex="0"
+                            aria-describedby="game-instructions"></canvas>
+
+                    <div class="flex column flex-justify-center overlay" role="dialog" aria-live="assertive">
+                        <span id="status" aria-label="Game status"></span>
+                        <span id="play" aria-label="Game instructions">Press SPACE to play!</span>
+                    </div>
+                </div>
+
+                <div id="game-instructions" class="sr-only">
+                    Use the left and right arrow keys to move your player bar.
+                    Catch falling blocks to score points. Red blocks are worth 1 point,
+                    blue blocks are worth 5 points, and white blocks are worth 25 points.
+                    Try to score 500 points before time runs out. Press space to start or restart the game.
                 </div>
             </div>
-            <div class="flex column" id="info">
-                <section>
-                    <h4>Info</h4>
+
+            <div class="flex column" id="info" role="complementary" aria-labelledby="info-heading">
+                <h2 id="info-heading" class="sr-only">Game Information</h2>
+                <section aria-labelledby="info-section">
+                    <h3 id="info-section">Info</h3>
                     <p class="blurb">Try to get 500 points before time runs out!</p>
                 </section>
 
-                <section>
-                    <h4>Controls</h4>
-                    <ul id="controls">
-                        <li><span><kbd>&larr;</kbd> Move Player Bar Left</span></li>
-                        <li><span><kbd>&rarr;</kbd> Move Player Bar Right</span></li>
-                        <li><span><kbd>_</kbd> Start Game</span></li>
+                <section aria-labelledby="controls-section">
+                    <h3 id="controls-section">Controls</h3>
+                    <ul id="controls" role="list">
+                        <li role="listitem"><span><kbd aria-label="Left arrow key">&larr;</kbd> Move Player Bar Left</span></li>
+                        <li role="listitem"><span><kbd aria-label="Right arrow key">&rarr;</kbd> Move Player Bar Right</span></li>
+                        <li role="listitem"><span><kbd aria-label="Space bar">SPACE</kbd> Start Game</span></li>
                     </ul>
                 </section>
 
-                <section>
-                    <h4>Scoring</h4>
-                    <ul>
-                        <li><span><var class="red">01 points</var> Red Blocks</span></li>
-                        <li><span><var class="blue">05 points</var> Blue Blocks</span></li>
-                        <li><span><var class="white">25 points</var> White Blocks</span></li>
+                <section aria-labelledby="scoring-section">
+                    <h3 id="scoring-section">Scoring</h3>
+                    <ul role="list">
+                        <li role="listitem"><span><var class="red" aria-label="1 point">01 points</var> Red Blocks</span></li>
+                        <li role="listitem"><span><var class="blue" aria-label="5 points">05 points</var> Blue Blocks</span></li>
+                        <li role="listitem"><span><var class="white" aria-label="25 points">25 points</var> White Blocks</span></li>
                     </ul>
                 </section>
             </div>

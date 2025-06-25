@@ -3,7 +3,7 @@ import Player from "./player";
 import Block from "./block";
 import Keyboard from "./utils/keyboard";
 import HUD from "./hud";
-import {SCORE_THRESHOLD, MAX_SECONDS} from "./config";
+import {SCORE_THRESHOLD, MAX_SECONDS, BLOCK_INTERVAL} from "./config";
 
 
 export default new class Game {
@@ -12,26 +12,28 @@ export default new class Game {
     renderer!: Renderer;
     player!: Player;
     blocks!: Block[];
-    timer?: number;
     state: {
         score: number;
         started: boolean;
         timeLeft: number;
         lastFrame: number;
+        blockSpawn: number;
+        paused: boolean;
     };
 
     constructor() {
         this.tick = this.tick.bind(this);
-        this.processTimer = this.processTimer.bind(this);
-        this.startTimer = this.startTimer.bind(this);
         this.startGame = this.startGame.bind(this);
         this.initialize = this.initialize.bind(this);
+        this.togglePause = this.togglePause.bind(this);
 
         this.state = {
             score: 0,
             started: false,
             timeLeft: MAX_SECONDS,
             lastFrame: performance.now(),
+            blockSpawn: BLOCK_INTERVAL,
+            paused: false,
         };
 
         document.addEventListener("DOMContentLoaded", this.initialize);
@@ -53,15 +55,45 @@ export default new class Game {
         this.blocks = [];
 
         this.tick(performance.now()); // initial paint
+        this.renderer.draw(this.player); // ppaint player initially
+
+        // Set focus to canvas for keyboard accessibility
+        const canvas = document.getElementById("gl-canvas") as HTMLCanvasElement;
+        canvas?.focus();
     }
 
     tick(frameStart: number) {
-        // Tick the game
+
+        // Skip game logic if paused
+        if (this.state.paused || !this.state.started) {
+            this.state.lastFrame = frameStart;
+            window.requestAnimationFrame(this.tick);
+            return;
+        }
+
+        // Process time left
         const timestep = frameStart - this.state.lastFrame;
         this.state.lastFrame = frameStart;
+        this.state.timeLeft = Math.max(0, this.state.timeLeft - (timestep / 1000));
+        this.HUD.updateTime(this.state.timeLeft);
+        if (this.state.timeLeft <= 0) {
+            this.endGame();
+            window.requestAnimationFrame(this.tick);
+            return;
+        }
+
+        // Process block spawning
+        this.state.blockSpawn = Math.max(0, this.state.blockSpawn - timestep);
+        if (this.state.blockSpawn <= 0) {
+            this.blocks.push(new Block(this.renderer));
+            this.state.blockSpawn = BLOCK_INTERVAL;
+        }
+
+        // Process player movement
         const playerDirection = Keyboard.state.ArrowLeft ? -1 : Keyboard.state.ArrowRight ? 1 : 0;
         this.player.step(timestep, !this.state.started ? 0 : playerDirection);
 
+        // Process block gravity and collisions
         for (let i = 0; i < this.blocks.length; i++) {
             this.blocks[i].step(timestep);
 
@@ -86,11 +118,13 @@ export default new class Game {
     }
 
     startGame() {
-        if (this.state.started) return;
+        if (this.state.started) return this.togglePause();
+        this.state.timeLeft = MAX_SECONDS;
+        this.state.blockSpawn = BLOCK_INTERVAL;
+        this.state.paused = false;
         this.state.started = true;
         this.state.score = 0;
         this.HUD.startGame();
-        this.startTimer();
     }
 
     addScore(toAdd: number) {
@@ -101,22 +135,13 @@ export default new class Game {
     endGame() {
         if (!this.state.started) return;
         this.state.started = false;
-        clearInterval(this.timer);
         this.HUD.gameOver(this.state.score >= SCORE_THRESHOLD);
         this.blocks.splice(0, this.blocks.length);
     }
 
-    startTimer() {
-        this.state.timeLeft = MAX_SECONDS;
-        this.timer = setInterval(() => {
-            if (--this.state.timeLeft < 0) this.state.timeLeft = 0;
-            this.HUD.updateTime(this.state.timeLeft);
-            this.processTimer(this.state.timeLeft);
-        }, 1000);
-    }
-
-    processTimer(timeRemaining: number) {
-        if (!timeRemaining) return this.endGame();
-        this.blocks.push(new Block(this.renderer));
+    togglePause() {
+        if (!this.state.started) return;
+        this.state.paused = !this.state.paused;
+        this.HUD.pauseGame(this.state.paused);
     }
 };
