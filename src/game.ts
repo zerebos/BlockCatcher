@@ -4,7 +4,6 @@ import Block from "./block";
 import Keyboard from "./utils/keyboard";
 import HUD from "./hud";
 import {SCORE_THRESHOLD, MAX_SECONDS} from "./config";
-import "./styles/index.css";
 
 
 export default new class Game {
@@ -49,10 +48,10 @@ export default new class Game {
         this.state.lastFrame = frameStart;
         const playerDirection = Keyboard.state.ArrowLeft ? -1 : Keyboard.state.ArrowRight ? 1 : 0;
         this.player.step(timestep, !this.state.started ? 0 : playerDirection);
-        
+
         for (let i = 0; i < this.blocks.length; i++) {
             this.blocks[i].step(timestep);
-            
+
             if (this.player.collides(this.blocks[i])) {
                 this.addScore(this.blocks[i].blockData.points);
                 this.blocks.splice(i, 1);
@@ -68,7 +67,7 @@ export default new class Game {
         this.renderer.clearColorBuffer();
         this.renderer.draw(this.player);
         for (let i = 0; i < this.blocks.length; i++) this.renderer.draw(this.blocks[i]);
-        
+
         // Call for next tick
         window.requestAnimationFrame(this.tick);
     }

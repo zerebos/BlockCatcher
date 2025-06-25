@@ -4,8 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "webpack --mode production --no-devtool",
-    "dev": "webpack serve --progress --color",
+    "build": "bun build --minify src/index.html --outdir dist",
+    "dev": "bun src/index.html",
+    "prod": "bun run build && cp -R assets dist/assets",
     "lint": "eslint --ext .jsx,.js src/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,17 +14,8 @@
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
-    "copy-webpack-plugin": "^11.0.0",
-    "css-loader": "^6.8.1",
-    "eslint": "^8.45.0",
-    "html-webpack-plugin": "^5.5.3",
-    "postcss": "^8.4.27",
-    "postcss-csso": "^6.0.1",
-    "postcss-easy-import": "^4.0.0",
-    "postcss-loader": "^7.3.3",
-    "style-loader": "^3.3.3",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "@zerebos/eslint-config": "^1.0.1",
+    "@zerebos/eslint-config-typescript": "^1.0.1",
+    "eslint": "^9.29.0"
   }
 }

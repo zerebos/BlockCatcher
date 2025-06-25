@@ -1,5 +1,5 @@
-import vertexShaderSource from "../shaders/main.vert";
-import fragmentShaderSource from "../shaders/main.frag";
+import vertexShaderSource from "../shaders/main.vert" with {type: "text"};
+import fragmentShaderSource from "../shaders/main.frag" with {type: "text"};
 import {BG_COLOR} from "../config";
 
 
@@ -16,11 +16,11 @@ export default class Renderer {
         this.vertexShader = this.webgl.createShader(this.webgl.VERTEX_SHADER);
         this.webgl.shaderSource(this.vertexShader, vertexShaderSource);
         this.webgl.compileShader(this.vertexShader);
-        
+
         this.fragShader = this.webgl.createShader(this.webgl.FRAGMENT_SHADER);
         this.webgl.shaderSource(this.fragShader, fragmentShaderSource);
         this.webgl.compileShader(this.fragShader);
-        
+
         this.shaderProgram = this.webgl.createProgram();
         this.webgl.attachShader(this.shaderProgram, this.vertexShader);
         this.webgl.attachShader(this.shaderProgram, this.fragShader);
@@ -30,7 +30,7 @@ export default class Renderer {
 
         // Bind locations
         this.positionLocation = this.webgl.getAttribLocation(this.shaderProgram, "myPosition");
-        
+
         this.xshiftLocation = this.webgl.getUniformLocation(this.shaderProgram, "xshift");
         this.yshiftLocation = this.webgl.getUniformLocation(this.shaderProgram, "yshift");
 

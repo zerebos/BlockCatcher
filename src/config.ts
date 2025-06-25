@@ -1,5 +1,5 @@
-export const SCORE_THRESHOLD = process.env.PROD ? 500 : 1;
-export const MAX_SECONDS = process.env.PROD ? 60 : 10;
+export const SCORE_THRESHOLD = "hot" in import.meta ? 1 : 500;
+export const MAX_SECONDS = "hot" in import.meta ? 10 : 60;
 export const PLAYER_COLOR = [0, 1, 0];
 export const BG_COLOR = [0, 0, 0];
 export const BLOCKS = [

@@ -1,1 +1,4 @@
-@import "./*.css";
+@import "./base.css";
+@import "./flex.css";
+@import "./game.css";
+@import "./github.css";
