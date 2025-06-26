@@ -1,17 +1,23 @@
 import Renderer from "./utils/renderer";
 import Player from "./player";
 import Block from "./block";
+import ObjectPool from "./utils/object-pool";
 import Keyboard from "./utils/keyboard";
 import HUD from "./hud";
+import DOMManager from "./utils/dom-manager";
+import AudioManager from "./utils/audio-manager";
 import {SCORE_THRESHOLD, MAX_SECONDS, BLOCK_INTERVAL} from "./config";
 
 
 export default new class Game {
 
     HUD!: HUD;
+    domManager!: DOMManager;
+    audioManager!: AudioManager;
     renderer!: Renderer;
     player!: Player;
     blocks!: Block[];
+    blockPool!: ObjectPool<Block>;
     state: {
         score: number;
         started: boolean;
@@ -42,11 +48,26 @@ export default new class Game {
     }
 
     initialize() {
+        // Initialize DOM manager first
+        this.domManager = new DOMManager();
+        if (!this.domManager.initialize()) {
+            throw new Error("Failed to initialize DOM elements");
+        }
+
+        // Initialize audio manager
+        this.audioManager = new AudioManager();
+        this.domManager.updateAudioButton(this.audioManager.isEnabled());
+        this.domManager.addAudioToggleListener(() => {
+            this.audioManager.toggleMute((enabled) => {
+                this.domManager.updateAudioButton(enabled);
+            });
+        });
+
         /** @type {HUD} */
-        this.HUD = new HUD(MAX_SECONDS);
+        this.HUD = new HUD(MAX_SECONDS, this.domManager);
 
         /** @type {Renderer} */
-        this.renderer = new Renderer(document.getElementById("gl-canvas") as HTMLCanvasElement); // create new renderer
+        this.renderer = new Renderer(this.domManager.getCanvas());
 
         /** @type {Player} */
         this.player = new Player(this.renderer); // create new player
@@ -54,12 +75,14 @@ export default new class Game {
         /** @type {Block[]} */
         this.blocks = [];
 
+        /** @type {ObjectPool<Block>} */
+        this.blockPool = new ObjectPool(() => new Block(this.renderer), 20, 50);
+
         this.tick(performance.now()); // initial paint
         this.renderer.draw(this.player); // ppaint player initially
 
         // Set focus to canvas for keyboard accessibility
-        const canvas = document.getElementById("gl-canvas") as HTMLCanvasElement;
-        canvas?.focus();
+        this.domManager.focusCanvas();
     }
 
     tick(frameStart: number) {
@@ -85,7 +108,10 @@ export default new class Game {
         // Process block spawning
         this.state.blockSpawn = Math.max(0, this.state.blockSpawn - timestep);
         if (this.state.blockSpawn <= 0) {
-            this.blocks.push(new Block(this.renderer));
+            const newBlock = this.blockPool.acquire();
+            if (newBlock) {
+                this.blocks.push(newBlock);
+            }
             this.state.blockSpawn = BLOCK_INTERVAL;
         }
 
@@ -99,10 +125,12 @@ export default new class Game {
 
             if (this.player.collides(this.blocks[i])) {
                 this.addScore(this.blocks[i].blockData.points);
+                this.blockPool.release(this.blocks[i]);
                 this.blocks.splice(i, 1);
                 i--;
             }
             else if (this.blocks[i].y <= -1.0) {
+                this.blockPool.release(this.blocks[i]);
                 this.blocks.splice(i, 1);
                 i--;
             }
@@ -119,23 +147,47 @@ export default new class Game {
 
     startGame() {
         if (this.state.started) return this.togglePause();
+
+        // Resume audio context on user interaction
+        this.audioManager.resumeAudio();
+
         this.state.timeLeft = MAX_SECONDS;
         this.state.blockSpawn = BLOCK_INTERVAL;
         this.state.paused = false;
         this.state.started = true;
         this.state.score = 0;
         this.HUD.startGame();
+
+        // Play game start sound
+        this.audioManager.playGameStart();
     }
 
     addScore(toAdd: number) {
         this.state.score = this.state.score + toAdd;
         this.HUD.updateScore(this.state.score);
+
+        // Play block catch sound with pitch based on points
+        this.audioManager.playBlockCatch(toAdd);
     }
 
     endGame() {
         if (!this.state.started) return;
         this.state.started = false;
-        this.HUD.gameOver(this.state.score >= SCORE_THRESHOLD);
+        const won = this.state.score >= SCORE_THRESHOLD;
+        this.HUD.gameOver(won);
+
+        // Play appropriate ending sound
+        if (won) {
+            this.audioManager.playVictory();
+        }
+        else {
+            this.audioManager.playGameOver();
+        }
+
+        // Return all active blocks to the pool
+        for (const block of this.blocks) {
+            this.blockPool.release(block);
+        }
         this.blocks.splice(0, this.blocks.length);
     }
 

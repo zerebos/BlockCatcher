@@ -1,6 +1,7 @@
-export const SCORE_THRESHOLD = "hot" in import.meta ? 1 : 500;
+export const SCORE_THRESHOLD = "hot" in import.meta ? 500 : 500;
 export const MAX_SECONDS = "hot" in import.meta ? 10 : 60;
-export const BLOCK_INTERVAL = "hot" in import.meta ? 1000 : 1000;
+export const BLOCK_INTERVAL = "hot" in import.meta ? 100 : 1000;
+export const MASTER_VOLUME = 0.6;
 export const PLAYER_COLOR = [0, 1, 0];
 export const BG_COLOR = [0, 0, 0];
 export const BLOCKS = [

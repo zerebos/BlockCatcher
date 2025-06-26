@@ -1,73 +1,88 @@
-export default class HUD {
+import DOMManager, {type UIState} from "./utils/dom-manager";
 
-    timeIndicator: HTMLSpanElement;
-    scoreIndicator: HTMLSpanElement;
-    winIndicator: HTMLSpanElement;
-    playIndicator: HTMLSpanElement;
-    maxTime: number;
+export default class HUD {
+    private domManager: DOMManager;
+    private maxTime: number;
+    private currentState: UIState;
 
     /**
-     * HUD class to manage the game's heads-up display.
+     * HUD class to manage the game's heads-up display using DOM abstraction.
      * @param {number} maxTime - The maximum time for the game in seconds.
+     * @param {DOMManager} domManager - The DOM manager instance
      */
-
-    constructor(maxTime: number) {
-        this.timeIndicator = document.getElementById("time")!;
-        this.scoreIndicator = document.getElementById("score")!;
-        this.winIndicator = document.getElementById("status")!;
-        this.playIndicator = document.getElementById("play")!;
-
+    constructor(maxTime: number, domManager: DOMManager) {
+        this.domManager = domManager;
         this.maxTime = maxTime;
-        this.updateTime(this.maxTime);
-        this.updateScore(0);
+
+        const minutes = Math.floor(maxTime / 60);
+        const seconds = maxTime % 60;
+
+        this.currentState = {
+            score: 0,
+            timeMinutes: minutes,
+            timeSeconds: seconds,
+            gameStatus: "ready",
+            message: ""
+        };
+
+        // Initialize UI
+        this.domManager.updateUI(this.currentState);
     }
 
     startGame() {
-        this.playIndicator.parentElement!.classList.add("hide");
-        this.scoreIndicator.textContent = "0";
-        this.scoreIndicator.setAttribute("aria-label", "Current score: 0 points");
+        this.currentState = {
+            ...this.currentState,
+            score: 0,
+            gameStatus: "playing",
+            message: ""
+        };
+
         this.updateTime(this.maxTime);
-        this.winIndicator.classList.remove("win");
-        this.winIndicator.classList.remove("loss");
-        this.winIndicator.textContent = "";
-        this.winIndicator.setAttribute("aria-label", "Game in progress");
+        this.domManager.updateUI(this.currentState);
     }
 
     pauseGame(paused = true) {
-        if (paused) this.playIndicator.parentElement!.classList.remove("hide");
-        else this.playIndicator.parentElement!.classList.add("hide");
-        this.playIndicator.textContent = paused ? "Game Paused" : "";
-        this.playIndicator.setAttribute("aria-label", paused ? "Game is paused. Press Space to resume." : "Game resumed");
+        this.currentState = {
+            ...this.currentState,
+            gameStatus: paused ? "paused" : "playing",
+            message: paused ? "Game Paused" : ""
+        };
+
+        this.domManager.updateUI(this.currentState);
     }
 
     updateTime(secondsRemaining: number) {
         const minutes = Math.round(secondsRemaining / 60);
         const seconds = Math.ceil(secondsRemaining % 60);
 
-        const displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
-        const displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
+        this.currentState = {
+            ...this.currentState,
+            timeMinutes: minutes,
+            timeSeconds: seconds
+        };
 
-        this.timeIndicator.textContent = displayMinutes + ":" + displaySeconds;
-
-        // Announce time updates to screen readers at intervals
-        if (secondsRemaining <= 10 || Math.ceil(secondsRemaining % 15) === 0) {
-            this.timeIndicator.setAttribute("aria-label", `Time remaining: ${minutes} minutes and ${seconds} seconds`);
-        }
+        // Update only the time to avoid unnecessary full UI updates
+        this.domManager.updateTime(minutes, seconds);
     }
 
     updateScore(score: number) {
-        this.scoreIndicator.textContent = score.toString();
-        this.scoreIndicator.setAttribute("aria-label", `Current score: ${score} points`);
+        this.currentState = {
+            ...this.currentState,
+            score
+        };
+
+        // Update only the score to avoid unnecessary full UI updates
+        this.domManager.updateScore(score);
     }
 
     gameOver(win = true) {
-        const message = `YOU ${win ? "WIN" : "LOSE"}!`;
-        this.winIndicator.textContent = message;
-        this.winIndicator.classList.add(win ? "win" : "loss");
-        this.winIndicator.setAttribute("aria-label", `Game over: ${message}`);
+        this.currentState = {
+            ...this.currentState,
+            gameStatus: win ? "win" : "lose",
+            message: ""
+        };
 
-        this.playIndicator.parentElement!.classList.remove("hide");
-        this.playIndicator.textContent = "Press SPACE to play again!";
-        this.playIndicator.setAttribute("aria-label", "Game ended. Press space bar to play again");
+        this.domManager.updateUI(this.currentState);
+        this.domManager.focusCanvas();
     }
 }
