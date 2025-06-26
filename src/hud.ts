@@ -1,4 +1,5 @@
-import DOMManager, {type UIState} from "./utils/dom-manager";
+import DOMManager from "./utils/dom-manager";
+import type {UIState} from "./types";
 
 export default class HUD {
     private domManager: DOMManager;
@@ -52,8 +53,8 @@ export default class HUD {
     }
 
     updateTime(secondsRemaining: number) {
-        const minutes = Math.round(secondsRemaining / 60);
-        const seconds = Math.ceil(secondsRemaining % 60);
+        const minutes = Math.floor(Math.ceil(secondsRemaining) / 60);
+        const seconds = Math.ceil(Math.ceil(secondsRemaining) % 60);
 
         this.currentState = {
             ...this.currentState,

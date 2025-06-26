@@ -3,7 +3,7 @@
 }
 
 #forkongithub a {
-    background: linear-gradient(135deg, rgba(255, 0, 128, 0.1), rgba(0, 255, 255, 0.1));
+    background: linear-gradient(135deg, rgba(from var(--synthwave-pink) r g b / 0.1), rgba(from var(--synthwave-purple) r g b / 0.1), rgba(from var(--synthwave-cyan) r g b / 0.1));
     border: 1px solid rgba(255, 0, 128, 0.3);
     color: var(--text-primary);
     text-decoration: none;
@@ -20,7 +20,7 @@
 }
 
 #forkongithub a:hover {
-    background: linear-gradient(135deg, rgba(255, 0, 128, 0.15), rgba(0, 255, 255, 0.15));
+    background: linear-gradient(135deg, rgba(from var(--synthwave-pink) r g b / 0.5), rgba(from var(--synthwave-purple) r g b / 0.5), rgba(from var(--synthwave-cyan) r g b / 0.5));
     border-color: var(--synthwave-cyan);
     color: var(--text-primary);
     transform: translateY(-1px);

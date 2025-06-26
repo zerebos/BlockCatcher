@@ -153,20 +153,6 @@
     padding-top: 72px; /* Adjust for HUD height */
 }
 
-/* Add subtle glow around game canvas */
-#gl-canvas {
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    transition: border-color 0.2s ease;
-}
-
-#gl-canvas:focus {
-    border-color: var(--synthwave-cyan);
-    outline: 2px solid rgba(0, 255, 255, 0.3);
-    outline-offset: 2px;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-}
-
 /* Enhance the overlay styling */
 .overlay {
     position: absolute;
@@ -178,7 +164,6 @@
     border-radius: 6px;
     backdrop-filter: blur(4px);
     transition: all 0.2s ease;
-    border: 1px solid var(--border);
 }
 
 .overlay.hide {
@@ -225,7 +210,7 @@
 
 #play {
     font-size: 1rem;
-    background: linear-gradient(135deg, rgba(255, 0, 128, 0.8), rgba(0, 255, 255, 0.6));
+    background: linear-gradient(135deg, rgba(from var(--synthwave-pink) r g b / 0.33), rgba(from var(--synthwave-purple) r g b / 0.33), rgba(from var(--synthwave-cyan) r g b / 0.33));
     color: white;
     padding: 12px 24px;
     border-radius: 8px;
@@ -243,7 +228,7 @@
 }
 
 #play:hover {
-    background: linear-gradient(135deg, rgba(255, 0, 128, 0.9), rgba(0, 255, 255, 0.7));
+    background: linear-gradient(135deg, rgba(from var(--synthwave-pink) r g b / 0.66), rgba(from var(--synthwave-purple) r g b / 0.66), rgba(from var(--synthwave-cyan) r g b / 0.66));
     transform: translateY(-2px);
     box-shadow:
         0 4px 6px rgba(0, 0, 0, 0.1),
