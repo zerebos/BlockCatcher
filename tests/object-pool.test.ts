@@ -1,5 +1,6 @@
 import {describe, it, expect, beforeEach} from "bun:test";
-import ObjectPool, {type Poolable} from "../src/utils/object-pool";
+import ObjectPool from "../src/utils/object-pool";
+import type {Poolable} from "../src/types";
 
 // Mock Poolable object for testing
 class MockPoolableObject implements Poolable {

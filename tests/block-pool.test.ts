@@ -1,6 +1,6 @@
 import {describe, it, expect, beforeEach} from "bun:test";
 import ObjectPool from "../src/utils/object-pool";
-import Block from "../src/block";
+import Block from "../src/entities/block";
 
 // Mock renderer for testing
 const mockRenderer = {

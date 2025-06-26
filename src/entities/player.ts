@@ -1,8 +1,8 @@
-import {vec2} from "./utils/vectors";
-import Rectangle from "./utils/rectangle";
+import {vec2} from "../utils/vectors";
+import Rectangle from "../utils/rectangle";
 
-import {PLAYER_COLOR} from "./config";
-import type Renderer from "./utils/renderer";
+import {PLAYER_COLOR, darkenColor} from "../config";
+import type Renderer from "../utils/renderer";
 
 
 /**
@@ -15,6 +15,7 @@ export default class Player extends Rectangle {
     shiftX = 0;
     deltaTrans = 0.03;
     buffer: WebGLBuffer;
+    mainBuffer: WebGLBuffer;
 
     constructor(renderer: Renderer) {
         super([
@@ -25,6 +26,16 @@ export default class Player extends Rectangle {
         ]);
 
         this.buffer = renderer.createBuffer(this.points);
+
+        // Create the main player buffer (inset for stroke effect)
+        const strokeInset = 0.01;
+        const mainPoints = [
+            vec2(-0.15 + strokeInset, -0.925 - strokeInset),
+            vec2(0.15 - strokeInset, -0.925 - strokeInset),
+            vec2(0.15 - strokeInset, -0.975 + strokeInset),
+            vec2(-0.15 + strokeInset, -0.975 + strokeInset)
+        ];
+        this.mainBuffer = renderer.createBuffer(mainPoints);
     }
 
     get uniforms() {
@@ -32,6 +43,14 @@ export default class Player extends Rectangle {
             xshift: this.shiftX,
             yshift: 0,
             color: PLAYER_COLOR,
+        };
+    }
+
+    get strokeUniforms() {
+        return {
+            xshift: this.shiftX,
+            yshift: 0,
+            color: darkenColor(PLAYER_COLOR),
         };
     }
 

@@ -1,9 +1,9 @@
-import {vec2} from "./utils/vectors";
-import Rectangle from "./utils/rectangle";
-import {type Poolable} from "./utils/object-pool";
+import {vec2} from "../utils/vectors";
+import Rectangle from "../utils/rectangle";
+import type {Poolable} from "../types";
 
-import {BLOCKS} from "./config";
-import type Renderer from "./utils/renderer";
+import {BLOCKS, darkenColor} from "../config";
+import type Renderer from "../utils/renderer";
 
 
 const minSize = 0.1;
@@ -17,6 +17,7 @@ export default class Block extends Rectangle implements Poolable {
     shiftY: number;
     deltaTrans: number;
     buffer: WebGLBuffer;
+    mainBuffer: WebGLBuffer;
     private active: boolean = false;
     private renderer: Renderer;
 
@@ -38,6 +39,7 @@ export default class Block extends Rectangle implements Poolable {
         this.shiftY = 0;
         this.deltaTrans = 0;
         this.buffer = renderer.createBuffer(this.points);
+        this.mainBuffer = renderer.createBuffer(this.points); // Will be updated in reset()
         this.active = false;
 
         // Initialize the block to a valid, usable state
@@ -49,6 +51,14 @@ export default class Block extends Rectangle implements Poolable {
             xshift: 0,
             yshift: this.shiftY,
             color: this.blockData.color,
+        };
+    }
+
+    get strokeUniforms() {
+        return {
+            xshift: 0,
+            yshift: this.shiftY, // Match the main block movement
+            color: darkenColor(this.blockData.color, 0.6), // 40% darker for stroke
         };
     }
 
@@ -88,6 +98,21 @@ export default class Block extends Rectangle implements Poolable {
         this.renderer.webgl.bufferData(
             this.renderer.webgl.ARRAY_BUFFER,
             Float32Array.from(this.points.flat()),
+            this.renderer.webgl.STATIC_DRAW
+        );
+
+        // Update the main buffer with inset points
+        const strokeInset = 0.01;
+        const mainPoints = [
+            vec2(startX + strokeInset, 1.01 + (minSize * this.blockData.size) - strokeInset),
+            vec2(startX + (minSize * this.blockData.size) - strokeInset, 1.01 + (minSize * this.blockData.size) - strokeInset),
+            vec2(startX + (minSize * this.blockData.size) - strokeInset, 1.01 + strokeInset),
+            vec2(startX + strokeInset, 1.01 + strokeInset)
+        ];
+        this.renderer.webgl.bindBuffer(this.renderer.webgl.ARRAY_BUFFER, this.mainBuffer);
+        this.renderer.webgl.bufferData(
+            this.renderer.webgl.ARRAY_BUFFER,
+            Float32Array.from(mainPoints.flat()),
             this.renderer.webgl.STATIC_DRAW
         );
     }

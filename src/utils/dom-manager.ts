@@ -3,23 +3,7 @@
  * Provides a clean interface for UI updates and element management
  */
 
-export interface GameElements {
-    canvas: HTMLCanvasElement;
-    score: HTMLElement;
-    time: HTMLElement;
-    status: HTMLElement;
-    play: HTMLElement;
-    playParent: HTMLElement;
-    audioToggle: HTMLButtonElement;
-}
-
-export interface UIState {
-    score: number;
-    timeMinutes: number;
-    timeSeconds: number;
-    gameStatus: "playing" | "paused" | "win" | "lose" | "ready";
-    message: string;
-}
+import type {GameElements, UIState} from "../types";
 
 export default class DOMManager {
     private elements: GameElements;
@@ -162,7 +146,8 @@ export default class DOMManager {
 
             case "paused":
                 this.elements.status.textContent = "Game Paused";
-                this.elements.status.setAttribute("aria-label", "Game is paused. Press Escape to resume.");
+                this.elements.status.setAttribute("aria-label", "Game is paused. Press space bar to resume.");
+                this.showPlayButton("Press SPACE to resume!", "Game is paused. Press space bar to resume");
                 break;
 
             case "win":

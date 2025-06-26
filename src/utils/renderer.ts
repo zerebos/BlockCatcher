@@ -18,6 +18,19 @@ interface Renderable {
     };
 }
 
+/**
+ * Interface for objects that can be rendered with stroke effects.
+ * Extends Renderable to include stroke-specific properties.
+ */
+interface StrokeRenderable extends Renderable {
+    mainBuffer: WebGLBuffer;
+    strokeUniforms: {
+        xshift: number;
+        yshift: number;
+        color: number[];
+    };
+}
+
 export default class Renderer {
     webgl: WebGLRenderingContext;
     vertexShader: WebGLShader;
@@ -27,6 +40,8 @@ export default class Renderer {
     xshiftLocation: WebGLUniformLocation;
     yshiftLocation: WebGLUniformLocation;
     colorLocation: WebGLUniformLocation;
+    private programBound: boolean = false;
+    private vertexArrayEnabled: boolean = false;
 
     constructor(canvas: HTMLCanvasElement) {
         /** @type {WebGLRenderingContext} */
@@ -51,6 +66,7 @@ export default class Renderer {
         this.webgl.linkProgram(this.shaderProgram);
 
         this.webgl.useProgram(this.shaderProgram);
+        this.programBound = true;
 
         // Bind locations
         this.positionLocation = this.webgl.getAttribLocation(this.shaderProgram, "myPosition");
@@ -71,21 +87,83 @@ export default class Renderer {
     clearColorBuffer() {
         this.webgl.clear(this.webgl.COLOR_BUFFER_BIT);
     }
+
+    /**
+     * Invalidates the program bound state (call when context might have changed)
+     */
+    invalidateProgramState() {
+        this.programBound = false;
+    }
+
     /**
      * Draws a Renderable object using the WebGL context.
      * It binds the buffer, sets the attributes and uniforms, and draws the object.
      * @param {Renderable} obj - The object to be rendered.
      */
     draw<T extends Renderable>(obj: T) {
-        this.webgl.useProgram(this.shaderProgram);
-        this.webgl.bindBuffer(this.webgl.ARRAY_BUFFER, obj.buffer);
-        this.webgl.vertexAttribPointer(this.positionLocation, 2, this.webgl.FLOAT, false, 0, 0);
-        this.webgl.enableVertexAttribArray(this.positionLocation);
-
-        this.webgl.uniform1f(this.xshiftLocation, obj.uniforms.xshift);
-        this.webgl.uniform1f(this.yshiftLocation, obj.uniforms.yshift);
-        this.webgl.uniform4f(this.colorLocation, obj.uniforms.color[0], obj.uniforms.color[1], obj.uniforms.color[2], 1);
-
+        this.ensureProgramBound();
+        this.setupVertexAttributes(obj.buffer);
+        this.setUniforms(obj.uniforms);
         this.webgl.drawArrays(this.webgl.TRIANGLE_FAN, 0, obj.points.length);
+    }
+
+    /**
+     * Draws a StrokeRenderable object with an inset stroke effect.
+     * First draws the stroke (background/border effect) using the main buffer,
+     * then draws the main object using the mainBuffer.
+     * @param {StrokeRenderable} obj - The object to be rendered with stroke.
+     */
+    drawWithStroke<T extends StrokeRenderable>(obj: T) {
+        this.ensureProgramBound();
+
+        // Draw stroke
+        this.setupVertexAttributes(obj.buffer);
+        this.setUniforms(obj.strokeUniforms);
+        this.webgl.drawArrays(this.webgl.TRIANGLE_FAN, 0, obj.points.length);
+
+        // Draw main object
+        this.setupVertexAttributes(obj.mainBuffer);
+        this.setUniforms(obj.uniforms);
+        this.webgl.drawArrays(this.webgl.TRIANGLE_FAN, 0, obj.points.length);
+    }
+
+    /**
+     * Optimized setup for vertex attributes and uniforms
+     */
+    private setupVertexAttributes(buffer: WebGLBuffer) {
+        this.webgl.bindBuffer(this.webgl.ARRAY_BUFFER, buffer);
+        this.ensureVertexArrayEnabled();
+        this.webgl.vertexAttribPointer(this.positionLocation, 2, this.webgl.FLOAT, false, 0, 0);
+    }
+
+    /**
+     * Sets the uniforms for the shader program.
+     * This includes the x and y shifts and the color.
+     * @param {Renderable["uniforms"]} uniforms - The uniforms to set.
+     */
+    private setUniforms(uniforms: Renderable["uniforms"]) {
+        this.webgl.uniform1f(this.xshiftLocation, uniforms.xshift);
+        this.webgl.uniform1f(this.yshiftLocation, uniforms.yshift);
+        this.webgl.uniform4f(this.colorLocation, uniforms.color[0], uniforms.color[1], uniforms.color[2], 1.0);
+    }
+
+    /**
+     * Ensures the shader program is bound (avoids redundant useProgram calls)
+     */
+    private ensureProgramBound() {
+        if (!this.programBound) {
+            this.webgl.useProgram(this.shaderProgram);
+            this.programBound = true;
+        }
+    }
+
+    /**
+     * Ensures the vertex attribute array is enabled (avoids redundant calls)
+     */
+    private ensureVertexArrayEnabled() {
+        if (!this.vertexArrayEnabled) {
+            this.webgl.enableVertexAttribArray(this.positionLocation);
+            this.vertexArrayEnabled = true;
+        }
     }
 }

@@ -1,6 +1,6 @@
 import Renderer from "./utils/renderer";
-import Player from "./player";
-import Block from "./block";
+import Player from "./entities/player";
+import Block from "./entities/block";
 import ObjectPool from "./utils/object-pool";
 import Keyboard from "./utils/keyboard";
 import HUD from "./hud";
@@ -79,7 +79,7 @@ export default new class Game {
         this.blockPool = new ObjectPool(() => new Block(this.renderer), 20, 50);
 
         this.tick(performance.now()); // initial paint
-        this.renderer.draw(this.player); // ppaint player initially
+        this.renderer.drawWithStroke(this.player); // paint player initially
 
         // Set focus to canvas for keyboard accessibility
         this.domManager.focusCanvas();
@@ -138,8 +138,8 @@ export default new class Game {
 
         // Redraw everything
         this.renderer.clearColorBuffer();
-        this.renderer.draw(this.player);
-        for (let i = 0; i < this.blocks.length; i++) this.renderer.draw(this.blocks[i]);
+        this.renderer.drawWithStroke(this.player);
+        for (let i = 0; i < this.blocks.length; i++) this.renderer.drawWithStroke(this.blocks[i]);
 
         // Call for next tick
         window.requestAnimationFrame(this.tick);

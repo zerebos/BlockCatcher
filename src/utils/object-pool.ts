@@ -3,22 +3,7 @@
  * Manages a pool of reusable objects to avoid frequent allocation/deallocation
  */
 
-export interface Poolable {
-    /**
-     * Reset the object to its initial state for reuse
-     */
-    reset(): void;
-
-    /**
-     * Check if the object is currently active/in-use
-     */
-    isActive(): boolean;
-
-    /**
-     * Prepare the object for being returned to the pool (optional)
-     */
-    prepareForPool?(): void;
-}
+import type {Poolable} from "../types";
 
 export default class ObjectPool<T extends Poolable> {
     private available: T[] = [];
@@ -77,9 +62,7 @@ export default class ObjectPool<T extends Poolable> {
         if (this.inUse.has(obj)) {
             this.inUse.delete(obj);
             // Call prepareForPool if available to prepare object for storage
-            if (obj.prepareForPool) {
-                obj.prepareForPool();
-            }
+            obj.prepareForPool?.();
             // No fallback to reset() - objects should implement prepareForPool for proper pooling
             this.available.push(obj);
         }

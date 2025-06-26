@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeEach} from "bun:test";
-import Player from "../src/player";
+import Player from "../src/entities/player";
 import type Renderer from "../src/utils/renderer";
 
 // Mock renderer for testing
@@ -37,7 +37,7 @@ describe("Player", () => {
             const uniforms = player.uniforms;
             expect(uniforms.xshift).toBe(0);
             expect(uniforms.yshift).toBe(0);
-            expect(uniforms.color).toEqual([0, 1, 0]); // Green color
+            expect(uniforms.color).toEqual([1.0, 1.0, 1.0]); // White color
         });
 
         it("should update xshift uniform when player moves", () => {
