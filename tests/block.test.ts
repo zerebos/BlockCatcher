@@ -4,9 +4,16 @@ import {BLOCKS} from "../src/config";
 import type Renderer from "../src/utils/renderer";
 
 // Mock renderer for testing
-const mockRenderer: Pick<Renderer, "createBuffer"> = {
-    createBuffer: () => ({} as WebGLBuffer)
-};
+const mockRenderer = {
+    createBuffer: () => ({} as WebGLBuffer),
+    webgl: {
+        createBuffer: () => ({}),
+        bindBuffer: () => {},
+        bufferData: () => {},
+        ARRAY_BUFFER: 0,
+        STATIC_DRAW: 0
+    }
+} as any;
 
 describe("Block", () => {
     let block: Block;
@@ -17,6 +24,7 @@ describe("Block", () => {
         Math.random = () => 0.5; // Always return 0.5 for consistent positioning
 
         block = new Block(mockRenderer as Renderer);
+        // Block is now automatically initialized in constructor
 
         // Restore original Math.random
         Math.random = originalRandom;
@@ -86,6 +94,10 @@ describe("Block", () => {
             const block1 = new Block(mockRenderer as Renderer);
             const block2 = new Block(mockRenderer as Renderer);
 
+            // Initialize both blocks for testing
+            block1.reset();
+            block2.reset();
+
             Math.random = originalRandom;
 
             block1.step(25); // Normal timestep
@@ -99,7 +111,9 @@ describe("Block", () => {
             // Create multiple blocks and find ones with different speeds
             const blocks: Block[] = [];
             for (let i = 0; i < 20; i++) {
-                blocks.push(new Block(mockRenderer as Renderer));
+                const testBlock = new Block(mockRenderer as Renderer);
+                // Block is now automatically initialized in constructor
+                blocks.push(testBlock);
             }
 
             // Find blocks with different speeds
@@ -122,6 +136,7 @@ describe("Block", () => {
             // Generate many blocks to ensure we get all types
             for (let i = 0; i < 100; i++) {
                 const testBlock = new Block(mockRenderer as Renderer);
+                // Block is now automatically initialized in constructor
                 foundTypes.add(testBlock.blockData.speed);
             }
 
