@@ -3,22 +3,28 @@
 }
 
 #forkongithub a {
-    background: #000;
-    color: #fff;
+    background: linear-gradient(135deg, rgba(255, 0, 128, 0.1), rgba(0, 255, 255, 0.1));
+    border: 1px solid rgba(255, 0, 128, 0.3);
+    color: var(--text-primary);
     text-decoration: none;
-    font-family: arial, sans-serif;
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     text-align: center;
-    font-weight: bold;
-    padding: 5px 40px;
-    font-size: 1rem;
-    line-height: 2rem;
+    font-weight: 500;
+    padding: 8px 24px;
+    font-size: 0.9rem;
+    line-height: 1.5;
     position: relative;
-    transition: background-color 0.5s, color 0.5s;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 #forkongithub a:hover {
-    background: #00ff00;
-    color: #000;
+    background: linear-gradient(135deg, rgba(255, 0, 128, 0.15), rgba(0, 255, 255, 0.15));
+    border-color: var(--synthwave-cyan);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 10px rgba(0, 255, 255, 0.2);
 }
 
 #forkongithub a::before,
@@ -27,14 +33,15 @@
     width: 100%;
     display: block;
     position: absolute;
-    top: 1px;
+    top: 0;
     left: 0;
     height: 1px;
-    background: #00ff00;
+    background: var(--synthwave-gradient);
+    opacity: 0.4;
 }
 
 #forkongithub a::after {
-    bottom: 1px;
+    bottom: 0;
     top: auto;
 }
 
@@ -56,6 +63,17 @@
         top: 60px;
         right: -60px;
         transform: rotate(45deg);
-        box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+
+    #forkongithub a:hover {
+        transform: rotate(45deg) translateY(-2px);
+        box-shadow:
+            0 12px 40px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255, 255, 255, 0.3),
+            0 0 20px rgba(255, 255, 255, 0.2);
     }
 }

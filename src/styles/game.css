@@ -1,56 +1,298 @@
 #game-display {
     border-radius: 12px;
     overflow: hidden;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.07),
+        0 10px 15px rgba(0, 0, 0, 0.1);
+    /* max-width: 600px; */
+    /* width: 100%; */
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+#game-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--synthwave-gradient);
+    opacity: 0.6;
+    z-index: 2;
+}
+
+#game-display:hover {
+    box-shadow:
+        0 10px 15px rgba(0, 0, 0, 0.1),
+        0 20px 25px rgba(0, 0, 0, 0.15);
+}
+
+#game-display:hover::before {
+    opacity: 0.8;
+    box-shadow: 0 0 8px rgba(255, 0, 128, 0.3);
 }
 
 #hud {
     position: absolute;
     left: 0;
     right: 0;
-    justify-content: space-between;
-    padding: 10px 20px;
+    top: 0;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 16px 20px;
     z-index: 1;
-    font-weight: 600;
+    font-weight: 500;
+    background: rgba(24, 24, 27, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+}
+
+#hud > span:first-child {
+    justify-self: start;
+    background: var(--hover-bg);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+#hud > span:last-of-type {
+    justify-self: center;
+    background: var(--hover-bg);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+#hud > .audio-button {
+    justify-self: end;
 }
 
 #hud span[id] {
-    color: #00FF00;
+    color: var(--text-primary);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+#hud span[id]:hover {
+    color: var(--synthwave-cyan);
+}
+
+/* Add synthwave glow on score updates */
+#hud span[id].score-update {
+    color: var(--synthwave-pink);
+    text-shadow: 0 0 8px rgba(255, 0, 128, 0.5);
+}
+
+/* Time warning with synthwave accent */
+#hud #time.time-warning {
+    color: var(--synthwave-pink);
+    text-shadow: 0 0 8px rgba(255, 0, 128, 0.4);
+    animation: timeWarning 1s ease-in-out infinite alternate;
+}
+
+@keyframes timeWarning {
+    0% {
+        text-shadow: 0 0 8px rgba(255, 0, 128, 0.4);
+    }
+    100% {
+        text-shadow: 0 0 12px rgba(255, 0, 128, 0.6);
+    }
+}
+
+/* Audio toggle button */
+.audio-button {
+    background: var(--hover-bg);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.audio-button:hover {
+    background: var(--border-light);
+    border-color: var(--synthwave-cyan);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+}
+
+.audio-button:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.audio-button:active {
+    transform: scale(0.95);
+}
+
+.audio-button.muted {
+    opacity: 0.5;
+    background: var(--bg-end);
+    border-color: var(--border);
+}
+
+.audio-button.muted:hover {
+    background: var(--hover-bg);
+    opacity: 0.7;
 }
 
 #canvas-wrap {
     position: relative;
+    padding-top: 72px; /* Adjust for HUD height */
 }
 
+/* Add subtle glow around game canvas */
+#gl-canvas {
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease;
+}
+
+#gl-canvas:focus {
+    border-color: var(--synthwave-cyan);
+    outline: 2px solid rgba(0, 255, 255, 0.3);
+    outline-offset: 2px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+/* Enhance the overlay styling */
 .overlay {
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.9);
-    transition: opacity 200ms ease;
-    opacity: 1;
+    background: rgba(10, 10, 10, 0.95);
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
 }
 
 .overlay.hide {
     opacity: 0;
+    pointer-events: none;
 }
 
 .overlay span {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: 600;
+    font-weight: 500;
+    color: var(--text-primary);
+    width: max-content;
+    margin: 0 auto;
 }
 
+/* Improve game status messages */
 #status {
-    font-size: 32px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    color: var(--text-primary);
 }
 
 #status.loss {
-    color: #FF0000;
+    color: var(--synthwave-pink);
+    text-shadow: 0 0 10px rgba(255, 0, 128, 0.4);
 }
 
 #status.win {
-    color: #00FF00;
+    color: var(--synthwave-cyan);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+@keyframes celebration {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.05) rotate(-1deg); }
+    75% { transform: scale(1.05) rotate(1deg); }
+}
+
+#play {
+    font-size: 1rem;
+    background: linear-gradient(135deg, rgba(255, 0, 128, 0.8), rgba(0, 255, 255, 0.6));
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--synthwave-pink);
+    transition: all 0.2s ease;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.12),
+        0 0 10px rgba(255, 0, 128, 0.3);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#play:hover {
+    background: linear-gradient(135deg, rgba(255, 0, 128, 0.9), rgba(0, 255, 255, 0.7));
+    transform: translateY(-2px);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 0 20px rgba(255, 0, 128, 0.5),
+        0 0 30px rgba(0, 255, 255, 0.3);
+    border-color: var(--synthwave-cyan);
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+}
+
+#play:active {
+    transform: translateY(-1px);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 0 15px rgba(255, 0, 128, 0.4);
+}
+
+/* Subtle animations */
+@keyframes scoreUpdate {
+    0% { transform: scale(1); }
+    50% {
+        transform: scale(1.02);
+        color: var(--synthwave-pink);
+        text-shadow: 0 0 8px rgba(255, 0, 128, 0.5);
+    }
+    100% { transform: scale(1); }
+}
+
+/* Mobile responsiveness for game */
+@media (max-width: 768px) {
+    #game-display {
+        border-radius: 16px;
+    }
+
+    #hud {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .audio-button {
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 16px;
+    }
+
+    #status {
+        font-size: 1.5rem;
+    }
+
+    #play {
+        font-size: 1rem;
+    }
 }

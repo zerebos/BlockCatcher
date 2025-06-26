@@ -41,11 +41,13 @@
     </head>
 
     <body>
-        <div class="container">
-            <div id="forkongithub"><a href="https://github.com/zerebos/BlockCatcher" aria-label="View source code on GitHub">Find me on GitHub</a></div>
-            <h1 class="wide">Block Catcher</h1>
-            <iframe src="https://ghbtns.com/github-btn.html?user=zerebos&repo=BlockCatcher&type=star&count=true&size=large" frameborder="0" scrolling="0" width="120" height="30" title="GitHub star button for BlockCatcher repository"></iframe>
+        <div id="forkongithub"><a href="https://github.com/zerebos/BlockCatcher" aria-label="View source code on GitHub">Find me on GitHub</a></div>
 
+        <header class="page-header">
+            <h1>Block Catcher</h1>
+        </header>
+
+        <main class="game-container">
             <div class="flex column" id="game-display" role="main" aria-labelledby="game-title">
                 <h2 id="game-title" class="sr-only">Block Catcher Game</h2>
 
@@ -53,6 +55,12 @@
                     <div class="flex flex-space-evenly" id="hud" role="status" aria-live="polite" aria-label="Game statistics">
                         <span>Points: <span id="score" aria-label="Current score">0</span></span>
                         <span>Time: <span id="time" aria-label="Time remaining">01:00</span></span>
+                        <button id="audio-toggle"
+                                type="button"
+                                aria-label="Toggle sound effects on or off"
+                                class="audio-button">
+                            🔊
+                        </button>
                     </div>
 
                     <canvas id="gl-canvas"
@@ -76,33 +84,55 @@
                     Try to score 500 points before time runs out. Press space to start or restart the game.
                 </div>
             </div>
+        </main>
 
-            <div class="flex column" id="info" role="complementary" aria-labelledby="info-heading">
-                <h2 id="info-heading" class="sr-only">Game Information</h2>
-                <section aria-labelledby="info-section">
-                    <h3 id="info-section">Info</h3>
-                    <p class="blurb">Try to get 500 points before time runs out!</p>
-                </section>
+        <section class="info-cards" role="complementary" aria-labelledby="info-heading">
+            <h2 id="info-heading" class="sr-only">Game Information</h2>
 
-                <section aria-labelledby="controls-section">
-                    <h3 id="controls-section">Controls</h3>
-                    <ul id="controls" role="list">
-                        <li role="listitem"><span><kbd aria-label="Left arrow key">&larr;</kbd> Move Player Bar Left</span></li>
-                        <li role="listitem"><span><kbd aria-label="Right arrow key">&rarr;</kbd> Move Player Bar Right</span></li>
-                        <li role="listitem"><span><kbd aria-label="Space bar">SPACE</kbd> Start Game</span></li>
-                    </ul>
-                </section>
-
-                <section aria-labelledby="scoring-section">
-                    <h3 id="scoring-section">Scoring</h3>
-                    <ul role="list">
-                        <li role="listitem"><span><var class="red" aria-label="1 point">01 points</var> Red Blocks</span></li>
-                        <li role="listitem"><span><var class="blue" aria-label="5 points">05 points</var> Blue Blocks</span></li>
-                        <li role="listitem"><span><var class="white" aria-label="25 points">25 points</var> White Blocks</span></li>
-                    </ul>
-                </section>
+            <div class="info-card" aria-labelledby="info-section">
+                <h3 id="info-section">Game Info</h3>
+                <p class="blurb">Try to get 500 points before time runs out! Move your player bar to catch falling blocks of different values.</p>
+                <div class="star-wrap">
+                    <iframe src="https://ghbtns.com/github-btn.html?user=zerebos&repo=BlockCatcher&type=star&count=true&size=large" frameborder="0" scrolling="0" width="120" height="30" title="GitHub star button for BlockCatcher repository"></iframe>
+                </div>
             </div>
-        </div>
+
+            <div class="info-card" aria-labelledby="controls-section">
+                <h3 id="controls-section">Controls</h3>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <kbd aria-label="Left arrow key">&larr;</kbd>
+                        <span>Move Left</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd aria-label="Right arrow key">&rarr;</kbd>
+                        <span>Move Right</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd aria-label="Space bar">SPACE</kbd>
+                        <span>Start Game</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card" aria-labelledby="scoring-section">
+                <h3 id="scoring-section">Scoring</h3>
+                <div class="scoring-grid">
+                    <div class="score-item">
+                        <var class="red" aria-label="1 point">1 pt</var>
+                        <span>Red Blocks</span>
+                    </div>
+                    <div class="score-item">
+                        <var class="blue" aria-label="5 points">5 pts</var>
+                        <span>Blue Blocks</span>
+                    </div>
+                    <div class="score-item">
+                        <var class="white" aria-label="25 points">25 pts</var>
+                        <span>White Blocks</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </body>
 </html>
 
