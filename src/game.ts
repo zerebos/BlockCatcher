@@ -3,15 +3,13 @@ import Player from "./entities/player";
 import Block from "./entities/block";
 import ObjectPool from "./utils/object-pool";
 import Keyboard from "./utils/keyboard";
-import HUD from "./hud";
 import DOMManager from "./utils/dom-manager";
-import AudioManager from "./utils/audio-manager";
+import AudioManager from "./audio";
 import {SCORE_THRESHOLD, MAX_SECONDS, BLOCK_INTERVAL} from "./config";
 
 
 export default new class Game {
 
-    HUD!: HUD;
     domManager!: DOMManager;
     audioManager!: AudioManager;
     renderer!: Renderer;
@@ -63,8 +61,8 @@ export default new class Game {
             });
         });
 
-        /** @type {HUD} */
-        this.HUD = new HUD(MAX_SECONDS, this.domManager);
+        // Initialize game UI
+        this.domManager.initializeGameUI(MAX_SECONDS);
 
         /** @type {Renderer} */
         this.renderer = new Renderer(this.domManager.getCanvas());
@@ -98,7 +96,7 @@ export default new class Game {
         const timestep = frameStart - this.state.lastFrame;
         this.state.lastFrame = frameStart;
         this.state.timeLeft = Math.max(0, this.state.timeLeft - (timestep / 1000));
-        this.HUD.updateTime(this.state.timeLeft);
+        this.domManager.updateTime(this.state.timeLeft);
         if (this.state.timeLeft <= 0) {
             this.endGame();
             window.requestAnimationFrame(this.tick);
@@ -156,7 +154,7 @@ export default new class Game {
         this.state.paused = false;
         this.state.started = true;
         this.state.score = 0;
-        this.HUD.startGame();
+        this.domManager.startGameUI(MAX_SECONDS);
 
         // Play game start sound
         this.audioManager.playGameStart();
@@ -164,7 +162,7 @@ export default new class Game {
 
     addScore(toAdd: number) {
         this.state.score = this.state.score + toAdd;
-        this.HUD.updateScore(this.state.score);
+        this.domManager.updateScore(this.state.score);
 
         // Play block catch sound with pitch based on points
         this.audioManager.playBlockCatch(toAdd);
@@ -174,7 +172,7 @@ export default new class Game {
         if (!this.state.started) return;
         this.state.started = false;
         const won = this.state.score >= SCORE_THRESHOLD;
-        this.HUD.gameOver(won);
+        this.domManager.endGameUI(won);
 
         // Play appropriate ending sound
         if (won) {
@@ -194,6 +192,6 @@ export default new class Game {
     togglePause() {
         if (!this.state.started) return;
         this.state.paused = !this.state.paused;
-        this.HUD.pauseGame(this.state.paused);
+        this.domManager.togglePauseUI(this.state.paused);
     }
 };

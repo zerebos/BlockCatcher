@@ -103,17 +103,36 @@ export default class DOMManager {
 
     /**
      * Update time display with accessibility and time warning
+     * Accepts fractional seconds and handles display conversion
      */
-    updateTime(minutes: number, seconds: number): void {
+    updateTime(secondsRemaining: number): void;
+    updateTime(minutes: number, seconds: number): void;
+    updateTime(minutesOrSeconds: number, seconds?: number): void {
         this.ensureInitialized();
 
-        const displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
-        const displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
+        let minutes: number;
+        let displaySeconds: number;
 
-        this.elements.time.textContent = `${displayMinutes}:${displaySeconds}`;
+        // Handle overloaded parameters
+        if (seconds === undefined) {
+            // Called with total seconds (fractional)
+            const totalSeconds = minutesOrSeconds;
+            minutes = Math.floor(Math.ceil(totalSeconds) / 60);
+            displaySeconds = Math.ceil(Math.ceil(totalSeconds) % 60);
+        }
+        else {
+            // Called with separate minutes and seconds
+            minutes = minutesOrSeconds;
+            displaySeconds = seconds;
+        }
+
+        const displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
+        const displaySecondsStr = displaySeconds < 10 ? "0" + displaySeconds : displaySeconds.toString();
+
+        this.elements.time.textContent = `${displayMinutes}:${displaySecondsStr}`;
 
         // Add synthwave warning when time is low (last 10 seconds)
-        const totalSeconds = minutes * 60 + seconds;
+        const totalSeconds = minutes * 60 + displaySeconds;
         if (totalSeconds <= 10 && totalSeconds > 0) {
             this.elements.time.classList.add("time-warning");
         }
@@ -124,7 +143,7 @@ export default class DOMManager {
         // Announce time updates to screen readers at intervals
         if (totalSeconds <= 10 || totalSeconds % 15 === 0) {
             this.elements.time.setAttribute("aria-label",
-                `Time remaining: ${minutes} minutes and ${seconds} seconds`);
+                `Time remaining: ${minutes} minutes and ${displaySeconds} seconds`);
         }
     }
 
@@ -280,5 +299,53 @@ export default class DOMManager {
     destroy(): void {
         this.isInitialized = false;
         // Additional cleanup if needed
+    }
+
+    /**
+     * Initialize game UI to ready state
+     */
+    initializeGameUI(maxTimeSeconds: number): void {
+        this.ensureInitialized();
+
+        const minutes = Math.floor(maxTimeSeconds / 60);
+        const seconds = maxTimeSeconds % 60;
+
+        this.updateUI({
+            score: 0,
+            timeMinutes: minutes,
+            timeSeconds: seconds,
+            gameStatus: "ready",
+            message: ""
+        });
+    }
+
+    /**
+     * Start game - update UI to playing state
+     */
+    startGameUI(maxTimeSeconds: number): void {
+        this.ensureInitialized();
+
+        this.updateGameStatus("playing", "");
+        this.updateScore(0);
+        this.updateTime(maxTimeSeconds);
+    }
+
+    /**
+     * End game - update UI to win/lose state and focus canvas
+     */
+    endGameUI(won: boolean): void {
+        this.ensureInitialized();
+
+        this.updateGameStatus(won ? "win" : "lose", "");
+        this.focusCanvas();
+    }
+
+    /**
+     * Toggle pause state
+     */
+    togglePauseUI(paused: boolean): void {
+        this.ensureInitialized();
+
+        this.updateGameStatus(paused ? "paused" : "playing", paused ? "Game Paused" : "");
     }
 }
