@@ -1,6 +1,6 @@
 import {describe, it, expect, beforeEach} from "bun:test";
 import Player from "../src/entities/player";
-import type Renderer from "../src/utils/renderer";
+import type Renderer from "../src/managers/render";
 
 // Mock renderer for testing
 const mockRenderer: Pick<Renderer, "createBuffer"> = {

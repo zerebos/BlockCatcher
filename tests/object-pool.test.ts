@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeEach} from "bun:test";
-import ObjectPool from "../src/utils/object-pool";
+import ObjectPool from "../src/managers/pool";
 import type {Poolable} from "../src/types";
 
 // Mock Poolable object for testing

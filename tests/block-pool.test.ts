@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeEach} from "bun:test";
-import ObjectPool from "../src/utils/object-pool";
+import ObjectPool from "../src/managers/pool";
 import Block from "../src/entities/block";
 
 // Mock renderer for testing
@@ -12,7 +12,7 @@ const mockRenderer = {
         STATIC_DRAW: 0
     },
     createBuffer: () => ({})
-} as unknown as import("../src/utils/renderer").default;
+} as unknown as import("../src/managers/render").default;
 
 describe("Block Pool Integration", () => {
     let blockPool: ObjectPool<Block>;

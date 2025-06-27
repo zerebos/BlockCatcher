@@ -2,7 +2,7 @@ import {describe, it, expect} from "bun:test";
 import Player from "../src/entities/player";
 import Block from "../src/entities/block";
 import Rectangle from "../src/utils/rectangle";
-import type Renderer from "../src/utils/renderer";
+import type Renderer from "../src/managers/render";
 
 // Mock renderer for testing
 const mockRenderer = {

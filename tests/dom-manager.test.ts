@@ -1,6 +1,6 @@
 import {describe, it, expect, beforeEach, afterEach} from "bun:test";
 import {Window} from "happy-dom";
-import DOMManager from "../src/utils/dom-manager";
+import DOMManager from "../src/managers/dom";
 import {readFileSync} from "fs";
 import {join} from "path";
 

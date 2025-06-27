@@ -1,10 +1,10 @@
-import Renderer from "./utils/renderer";
+import Renderer from "./managers/render";
 import Player from "./entities/player";
 import Block from "./entities/block";
-import ObjectPool from "./utils/object-pool";
-import Keyboard from "./utils/keyboard";
-import DOMManager from "./utils/dom-manager";
-import AudioManager from "./audio";
+import ObjectPool from "./managers/pool";
+import Keyboard from "./managers/inputs";
+import DOMManager from "./managers/dom";
+import AudioManager from "./managers/audio";
 import {SCORE_THRESHOLD, MAX_SECONDS, BLOCK_INTERVAL} from "./config";
 
 

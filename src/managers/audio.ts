@@ -3,11 +3,11 @@
  * Uses Web Audio API to generate procedural sounds
  */
 import {MASTER_VOLUME} from "../config";
-import blockCatch from "./block";
-import gameOver from "./gameover";
-import gameStart from "./gamestart";
-import toggleMute from "./mute";
-import victory from "./victory";
+import blockCatch from "../audio/block";
+import gameOver from "../audio/gameover";
+import gameStart from "../audio/gamestart";
+import toggleMute from "../audio/mute";
+import victory from "../audio/victory";
 
 export default class AudioManager {
     private audioContext: AudioContext | null = null;

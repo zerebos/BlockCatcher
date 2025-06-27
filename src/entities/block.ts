@@ -3,7 +3,7 @@ import Rectangle from "../utils/rectangle";
 import type {Poolable} from "../types";
 
 import {BLOCKS, darkenColor} from "../config";
-import type Renderer from "../utils/renderer";
+import type Renderer from "../managers/render";
 
 
 const minSize = 0.1;

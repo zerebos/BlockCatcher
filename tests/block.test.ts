@@ -1,7 +1,7 @@
 import {describe, it, expect, beforeEach} from "bun:test";
 import Block from "../src/entities/block";
 import {BLOCKS} from "../src/config";
-import type Renderer from "../src/utils/renderer";
+import type Renderer from "../src/managers/render";
 
 // Mock renderer for testing
 const mockRenderer = {

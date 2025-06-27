@@ -2,7 +2,7 @@ import {vec2} from "../utils/vectors";
 import Rectangle from "../utils/rectangle";
 
 import {PLAYER_COLOR, darkenColor} from "../config";
-import type Renderer from "../utils/renderer";
+import type Renderer from "../managers/render";
 
 
 /**
