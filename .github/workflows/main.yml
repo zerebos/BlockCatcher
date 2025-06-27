@@ -1,50 +1,46 @@
 name: 🚀 Deploy website on push
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+
 permissions:
   contents: write
+
 jobs:
   build-and-deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v3
-        
-      - name: ⚙️ Setup PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-        
-      - name: 🔧 Use Node.js 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'pnpm'
-          
-#       - name: 📁 Get PNPM Store Directory
-#         shell: bash
-#         run: |
-#           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+        uses: actions/checkout@v4
 
-#       - name: 💾 Setup PNPM Cache
-#         uses: actions/cache@v3
-#         with:
-#           path: ${{ env.STORE_PATH }}
-#           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-#           restore-keys: |
-#             ${{ runner.os }}-pnpm-store-
+      - name: Prepare Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: 📦 Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: 📦 Install dependencies
+        run: bun install
+
+      - name: 🧪 Run tests
+        run: bun test
 
       - name: 🔨 Build Project
-        run: |
-          pnpm install
-          pnpm build
+        run: bun run prod
 
       - name: 🚀 Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist # The folder the action should deploy.
+          folder: dist
           branch: gh-pages
