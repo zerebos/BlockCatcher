@@ -1,1 +1,150 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"><title>Block Catcher - An Open Source WebGL Game</title><meta name="title" content="Block Catcher - An Open Source WebGL Game"/><meta name="description" content="A simple yet mind-numbingly addicting game for all ages! Move the player bar and try to catch the blocks falling out of the sky. See how many you can get before time runs out!"/><meta property="og:type" content="website"/><meta property="og:url" content="https://rauenzi.github.io/BlockCatcher/"/><meta property="og:title" content="Block Catcher - An Open Source WebGL Game"/><meta property="og:description" content="A simple yet mind-numbingly addicting game for all ages! Move the player bar and try to catch the blocks falling out of the sky. See how many you can get before time runs out!"/><meta property="og:image" content="https://rauenzi.github.io/BlockCatcher/assets/images/blockcatcher.png"/><meta name="twitter:card" content="summary_large_image"/><meta property="twitter:domain" content="rauenzi.github.io"><meta property="twitter:url" content="https://rauenzi.github.io/BlockCatcher/"/><meta name="twitter:title" content="Block Catcher - An Open Source WebGL Game"/><meta name="twitter:description" content="A simple yet mind-numbingly addicting game for all ages! Move the player bar and try to catch the blocks falling out of the sky. See how many you can get before time runs out!"/><meta name="twitter:image" content="https://rauenzi.github.io/BlockCatcher/assets/images/blockcatcher.png"/><link rel="apple-touch-icon" sizes="114x114" href="assets/favicon/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png"><link rel="manifest" href="assets/favicon/site.webmanifest"><link rel="mask-icon" href="assets/favicon/safari-pinned-tab.svg" color="#00ff00"><link rel="shortcut icon" href="assets/favicon/favicon.ico"><meta name="msapplication-TileColor" content="#00a300"><meta name="msapplication-config" content="assets/favicon/browserconfig.xml"><meta name="theme-color" content="#00ff00"><title>Block Catcher</title><script defer="defer" src="main.js"></script></head><body><div class="container"><div id="forkongithub"><a href="https://github.com/rauenzi/BlockCatcher">Find me on GitHub</a></div><h2 class="wide">Block Catcher</h2><iframe src="https://ghbtns.com/github-btn.html?user=rauenzi&repo=BlockCatcher&type=star&count=true&size=large" frameborder="0" scrolling="0" width="120" height="30" title="GitHub"></iframe><div class="flex column" id="game-display"><div class="flex" id="canvas-wrap"><div class="flex flex-space-evenly" id="hud"><span>Points: <span id="score">0</span></span><span>Time: <span id="time">01:00</span></span></div><canvas id="gl-canvas" width="512" height="512"></canvas><div class="flex column flex-justify-center overlay"><span id="status"></span><span id="play">Press SPACE to play!</span></div></div></div><div class="flex column" id="info"><section><h4>Info</h4><p class="blurb">Try to get 500 points before time runs out!</p></section><section><h4>Controls</h4><ul id="controls"><li><span><kbd>&larr;</kbd> Move Player Bar Left</span></li><li><span><kbd>&rarr;</kbd> Move Player Bar Right</span></li><li><span><kbd>_</kbd> Start Game</span></li></ul></section><section><h4>Scoring</h4><ul><li><span><var class="red">01 points</var> Red Blocks</span></li><li><span><var class="blue">05 points</var> Blue Blocks</span></li><li><span><var class="white">25 points</var> White Blocks</span></li></ul></section></div></div></body></html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Primary Meta Tags -->
+        <title>Block Catcher - An Open Source WebGL Game</title>
+        <meta name="title" content="Block Catcher - An Open Source WebGL Game" />
+        <meta name="description" content="A simple yet mind-numbingly addicting game for all ages! Move the player bar and try to catch the blocks falling out of the sky. See how many you can get before time runs out!" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://zerebos.github.io/BlockCatcher/" />
+        <meta property="og:title" content="Block Catcher - An Open Source WebGL Game" />
+        <meta property="og:description" content="A simple yet mind-numbingly addicting game for all ages! Move the player bar and try to catch the blocks falling out of the sky. See how many you can get before time runs out!" />
+        <meta property="og:image" content="https://zerebos.github.io/BlockCatcher/assets/images/blockcatcher.png" />
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="zerebos.github.io">
+        <meta property="twitter:url" content="https://zerebos.github.io/BlockCatcher/" />
+        <meta name="twitter:title" content="Block Catcher - An Open Source WebGL Game" />
+        <meta name="twitter:description" content="A simple yet mind-numbingly addicting game for all ages! Move the player bar and try to catch the blocks falling out of the sky. See how many you can get before time runs out!" />
+        <meta name="twitter:image" content="https://zerebos.github.io/BlockCatcher/assets/images/blockcatcher.png" />
+
+        <!-- Favicon Tags -->
+        <link rel="apple-touch-icon" sizes="114x114" href="https://zerebos.github.io/BlockCatcher/assets/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="https://zerebos.github.io/BlockCatcher/assets/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="https://zerebos.github.io/BlockCatcher/assets/favicon/favicon-16x16.png">
+        <link rel="manifest" href="https://zerebos.github.io/BlockCatcher/assets/favicon/site.webmanifest">
+        <link rel="mask-icon" href="https://zerebos.github.io/BlockCatcher/assets/favicon/safari-pinned-tab.svg" color="#00ff00">
+        <link rel="shortcut icon" href="https://zerebos.github.io/BlockCatcher/assets/favicon/favicon.ico">
+        <meta name="msapplication-TileColor" content="#00a300">
+        <meta name="msapplication-config" content="https://zerebos.github.io/BlockCatcher/assets/favicon/browserconfig.xml">
+        <meta name="theme-color" content="#00ff00">
+
+        <title>Block Catcher</title>
+        
+        
+    <link rel="stylesheet" crossorigin href="./index-3nkge0q0.css"><script type="module" crossorigin src="./index-q4s27ymv.js"></script></head>
+
+    <body>
+        <div id="forkongithub"><a href="https://github.com/zerebos/BlockCatcher" aria-label="View source code on GitHub">Find me on GitHub</a></div>
+
+        <header class="page-header">
+            <div class="logo">
+                <div class="logo-text">
+                    <span class="logo-block">BLOCK</span>
+                    <span class="logo-catcher">CATCHER</span>
+                </div>
+                <div class="logo-accents" aria-hidden="true">
+                    <span class="logo-accent logo-accent-pink">▮</span>
+                    <span class="logo-accent logo-accent-purple">▮</span>
+                    <span class="logo-accent logo-accent-cyan">▮</span>
+                </div>
+                <div class="logo-underline"></div>
+            </div>
+        </header>
+
+        <main class="game-container">
+            <div class="flex column" id="game-display" role="main" aria-labelledby="game-title">
+                <h2 id="game-title" class="sr-only">Block Catcher Game</h2>
+
+                <div class="flex" id="canvas-wrap">
+                    <div class="flex flex-space-evenly" id="hud" role="status" aria-live="polite" aria-label="Game statistics">
+                        <span>Points: <span id="score" aria-label="Current score">0</span></span>
+                        <span>Time: <span id="time" aria-label="Time remaining">01:00</span></span>
+                        <button id="audio-toggle"
+                                type="button"
+                                aria-label="Toggle sound effects on or off"
+                                class="audio-button">
+                            🔊
+                        </button>
+                    </div>
+
+                    <canvas id="gl-canvas"
+                            width="512"
+                            height="512"
+                            role="application"
+                            aria-label="Block Catcher game canvas. Use left and right arrow keys to move the player bar and catch falling blocks. Press space to start."
+                            tabindex="0"
+                            aria-describedby="game-instructions"></canvas>
+
+                    <div class="flex column flex-justify-center overlay" role="dialog" aria-live="assertive">
+                        <span id="status" aria-label="Game status"></span>
+                        <span id="play" aria-label="Game instructions">Press SPACE to play!</span>
+                    </div>
+                </div>
+
+                <div id="game-instructions" class="sr-only">
+                    Use the left and right arrow keys to move your player bar.
+                    Catch falling blocks to score points. Pink blocks are worth 1 point,
+                    purple blocks are worth 5 points, and cyan blocks are worth 25 points.
+                    Try to score 500 points before time runs out. Press space to start or restart the game.
+                </div>
+            </div>
+        </main>
+
+        <section class="info-cards" role="complementary" aria-labelledby="info-heading">
+            <h2 id="info-heading" class="sr-only">Game Information</h2>
+
+            <div class="info-card" aria-labelledby="info-section">
+                <h3 id="info-section">Game Info</h3>
+                <p class="blurb">Try to get 500 points before time runs out! Move your player bar to catch falling blocks of different values.</p>
+                <div class="star-wrap">
+                    <iframe src="https://ghbtns.com/github-btn.html?user=zerebos&repo=BlockCatcher&type=star&count=true&size=large" frameborder="0" scrolling="0" width="120" height="30" title="GitHub star button for BlockCatcher repository"></iframe>
+                </div>
+            </div>
+
+            <div class="info-card" aria-labelledby="controls-section">
+                <h3 id="controls-section">Controls</h3>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <kbd aria-label="Left arrow key">&larr;</kbd>
+                        <span>Move Left</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd aria-label="Right arrow key">&rarr;</kbd>
+                        <span>Move Right</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd aria-label="Space bar">SPACE</kbd>
+                        <span>Start Game</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card" aria-labelledby="scoring-section">
+                <h3 id="scoring-section">Scoring</h3>
+                <div class="scoring-grid">
+                    <div class="score-item">
+                        <var class="pink" aria-label="1 point">1 pt</var>
+                        <span>Pink Blocks</span>
+                    </div>
+                    <div class="score-item">
+                        <var class="purple" aria-label="5 points">5 pts</var>
+                        <span>Purple Blocks</span>
+                    </div>
+                    <div class="score-item">
+                        <var class="cyan" aria-label="25 points">25 pts</var>
+                        <span>Cyan Blocks</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>
+
+
