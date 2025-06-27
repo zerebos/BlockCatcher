@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeEach} from "bun:test";
-import AudioManager from "../src/utils/audio-manager";
+import AudioManager from "../src/audio";
 
 // Mock Web Audio API for testing
 const mockAudioContext = {

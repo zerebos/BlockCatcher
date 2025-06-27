@@ -14,15 +14,15 @@ const mockRenderer = {
         ARRAY_BUFFER: 0,
         STATIC_DRAW: 0
     }
-} as any;
+} as unknown as Renderer;
 
 describe("Game Mechanics Integration", () => {
     describe("Player-Block Collision", () => {
         it("should detect collision when block falls on player", () => {
-            const player = new Player(mockRenderer as Renderer);
+            const player = new Player(mockRenderer);
 
             // Create a block positioned directly above the player
-            const block = new Block(mockRenderer as Renderer);
+            const block = new Block(mockRenderer);
             // Block is now automatically initialized in constructor
 
             // Manually position the block to overlap with player
@@ -41,8 +41,8 @@ describe("Game Mechanics Integration", () => {
         });
 
         it("should not detect collision when block misses player", () => {
-            const player = new Player(mockRenderer as Renderer);
-            const block = new Block(mockRenderer as Renderer);
+            const player = new Player(mockRenderer);
+            const block = new Block(mockRenderer);
             // Block is now automatically initialized in constructor
 
             // Position block far from player
@@ -57,8 +57,8 @@ describe("Game Mechanics Integration", () => {
         });
 
         it("should detect collision at player edges", () => {
-            const player = new Player(mockRenderer as Renderer);
-            const block = new Block(mockRenderer as Renderer);
+            const player = new Player(mockRenderer);
+            const block = new Block(mockRenderer);
             // Block is now automatically initialized in constructor
 
             // Position block at the edge of the player
@@ -77,8 +77,8 @@ describe("Game Mechanics Integration", () => {
 
     describe("Game Physics", () => {
         it("should have consistent movement scaling", () => {
-            const player = new Player(mockRenderer as Renderer);
-            const block = new Block(mockRenderer as Renderer);
+            const player = new Player(mockRenderer);
+            const block = new Block(mockRenderer);
             // Block is now automatically initialized in constructor
 
             const playerInitialX = player.x;
@@ -105,7 +105,7 @@ describe("Game Mechanics Integration", () => {
         });
 
         it("should handle boundary collisions properly", () => {
-            const player = new Player(mockRenderer as Renderer);
+            const player = new Player(mockRenderer);
 
             // Move player to left boundary
             for (let i = 0; i < 100; i++) {
@@ -182,12 +182,12 @@ describe("Game Mechanics Integration", () => {
 
     describe("Performance Considerations", () => {
         it("should handle many collision checks efficiently", () => {
-            const player = new Player(mockRenderer as Renderer);
+            const player = new Player(mockRenderer);
             const blocks: Block[] = [];
 
             // Create many blocks
             for (let i = 0; i < 100; i++) {
-                const block = new Block(mockRenderer as Renderer);
+                const block = new Block(mockRenderer);
                 // Block is now automatically initialized in constructor
                 blocks.push(block);
             }

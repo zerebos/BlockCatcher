@@ -1,5 +1,5 @@
 import {describe, it, expect} from "bun:test";
-import {SCORE_THRESHOLD, MAX_SECONDS, PLAYER_COLOR, BG_COLOR, BLOCKS} from "../src/config";
+import {SCORE_THRESHOLD, MAX_SECONDS, PLAYER_COLOR, BG_COLOR, BLOCKS, MASTER_VOLUME, darkenColor} from "../src/config";
 
 describe("Game Configuration", () => {
     describe("SCORE_THRESHOLD", () => {
@@ -9,8 +9,8 @@ describe("Game Configuration", () => {
         });
 
         it("should have different values for dev and prod", () => {
-            // The value should be either 1 (dev) or 500 (prod)
-            expect([1, 500]).toContain(SCORE_THRESHOLD);
+            // The value should be either 25 (dev) or 500 (prod)
+            expect([25, 500]).toContain(SCORE_THRESHOLD);
         });
     });
 
@@ -21,8 +21,8 @@ describe("Game Configuration", () => {
         });
 
         it("should have different values for dev and prod", () => {
-            // The value should be either 10 (dev) or 60 (prod)
-            expect([10, 60]).toContain(MAX_SECONDS);
+            // The value should be either 30 (dev) or 60 (prod)
+            expect([30, 60]).toContain(MAX_SECONDS);
         });
     });
 
@@ -39,8 +39,8 @@ describe("Game Configuration", () => {
             });
         });
 
-        it("should be green color", () => {
-            expect(PLAYER_COLOR).toEqual([0, 1, 0]);
+        it("should be white color", () => {
+            expect(PLAYER_COLOR).toEqual([1, 1, 1]);
         });
     });
 
@@ -103,39 +103,39 @@ describe("Game Configuration", () => {
         });
 
         describe("specific block types", () => {
-            it("should have red block (slow, large, 1 point)", () => {
-                const redBlock = BLOCKS.find(b =>
-                    b.color[0] === 1 && b.color[1] === 0 && b.color[2] === 0
+            it("should have pink block (slow, large, 1 point)", () => {
+                const pinkBlock = BLOCKS.find(b =>
+                    b.color[0] === 1 && b.color[1] === 0 && b.color[2] === 0.5
                 );
-                expect(redBlock).toBeTruthy();
-                if (redBlock) {
-                    expect(redBlock.speed).toBe(1);
-                    expect(redBlock.size).toBe(2.5);
-                    expect(redBlock.points).toBe(1);
+                expect(pinkBlock).toBeTruthy();
+                if (pinkBlock) {
+                    expect(pinkBlock.speed).toBe(1);
+                    expect(pinkBlock.size).toBe(2.5);
+                    expect(pinkBlock.points).toBe(1);
                 }
             });
 
-            it("should have blue block (medium speed, medium size, 5 points)", () => {
-                const blueBlock = BLOCKS.find(b =>
-                    b.color[0] === 0 && b.color[1] === 0 && b.color[2] === 1
+            it("should have purple block (medium speed, medium size, 5 points)", () => {
+                const purpleBlock = BLOCKS.find(b =>
+                    b.color[0] === 0.6 && b.color[1] === 0.2 && b.color[2] === 0.8
                 );
-                expect(blueBlock).toBeTruthy();
-                if (blueBlock) {
-                    expect(blueBlock.speed).toBe(2);
-                    expect(blueBlock.size).toBe(1.5);
-                    expect(blueBlock.points).toBe(5);
+                expect(purpleBlock).toBeTruthy();
+                if (purpleBlock) {
+                    expect(purpleBlock.speed).toBe(2);
+                    expect(purpleBlock.size).toBe(1.5);
+                    expect(purpleBlock.points).toBe(5);
                 }
             });
 
-            it("should have white block (fast, small, 25 points)", () => {
-                const whiteBlock = BLOCKS.find(b =>
-                    b.color[0] === 1 && b.color[1] === 1 && b.color[2] === 1
+            it("should have cyan block (fast, small, 25 points)", () => {
+                const cyanBlock = BLOCKS.find(b =>
+                    b.color[0] === 0 && b.color[1] === 1 && b.color[2] === 1
                 );
-                expect(whiteBlock).toBeTruthy();
-                if (whiteBlock) {
-                    expect(whiteBlock.speed).toBe(3);
-                    expect(whiteBlock.size).toBe(1);
-                    expect(whiteBlock.points).toBe(25);
+                expect(cyanBlock).toBeTruthy();
+                if (cyanBlock) {
+                    expect(cyanBlock.speed).toBe(3);
+                    expect(cyanBlock.size).toBe(1);
+                    expect(cyanBlock.points).toBe(25);
                 }
             });
         });
@@ -159,6 +159,61 @@ describe("Game Configuration", () => {
 
                 expect(fastestBlock.points).toBeGreaterThan(slowestBlock.points);
             });
+        });
+    });
+
+    describe("MASTER_VOLUME", () => {
+        it("should be a valid volume level", () => {
+            expect(typeof MASTER_VOLUME).toBe("number");
+            expect(MASTER_VOLUME).toBeGreaterThanOrEqual(0);
+            expect(MASTER_VOLUME).toBeLessThanOrEqual(1);
+        });
+
+        it("should be set to 60% volume", () => {
+            expect(MASTER_VOLUME).toBe(0.6);
+        });
+    });
+
+    describe("darkenColor utility", () => {
+        it("should darken a color by default factor", () => {
+            const color = [1, 0.8, 0.6];
+            const darkened = darkenColor(color);
+
+            expect(darkened[0]).toBeCloseTo(0.7, 5); // 1 * 0.7
+            expect(darkened[1]).toBeCloseTo(0.56, 5); // 0.8 * 0.7
+            expect(darkened[2]).toBeCloseTo(0.42, 5); // 0.6 * 0.7
+        });
+
+        it("should darken a color by custom factor", () => {
+            const color = [1, 1, 1];
+            const darkened = darkenColor(color, 0.5);
+
+            expect(darkened).toEqual([0.5, 0.5, 0.5]);
+        });
+
+        it("should not go below zero", () => {
+            const color = [0.1, 0.1, 0.1];
+            const darkened = darkenColor(color, 0.1);
+
+            darkened.forEach(component => {
+                expect(component).toBeGreaterThanOrEqual(0);
+            });
+        });
+
+        it("should handle synthwave colors correctly", () => {
+            const cyan = [0, 1, 1];
+            const pink = [1, 0, 0.5];
+
+            const darkenedCyan = darkenColor(cyan);
+            const darkenedPink = darkenColor(pink);
+
+            expect(darkenedCyan[0]).toBe(0); // 0 * 0.7 = 0
+            expect(darkenedCyan[1]).toBeCloseTo(0.7, 5); // 1 * 0.7 = 0.7
+            expect(darkenedCyan[2]).toBeCloseTo(0.7, 5); // 1 * 0.7 = 0.7
+
+            expect(darkenedPink[0]).toBeCloseTo(0.7, 5); // 1 * 0.7 = 0.7
+            expect(darkenedPink[1]).toBe(0); // 0 * 0.7 = 0
+            expect(darkenedPink[2]).toBeCloseTo(0.35, 5); // 0.5 * 0.7 = 0.35
         });
     });
 });

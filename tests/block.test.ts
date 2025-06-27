@@ -13,7 +13,7 @@ const mockRenderer = {
         ARRAY_BUFFER: 0,
         STATIC_DRAW: 0
     }
-} as any;
+} as unknown as Renderer;
 
 describe("Block", () => {
     let block: Block;
@@ -23,7 +23,7 @@ describe("Block", () => {
         const originalRandom = Math.random;
         Math.random = () => 0.5; // Always return 0.5 for consistent positioning
 
-        block = new Block(mockRenderer as Renderer);
+        block = new Block(mockRenderer);
         // Block is now automatically initialized in constructor
 
         // Restore original Math.random
@@ -91,8 +91,8 @@ describe("Block", () => {
             const originalRandom = Math.random;
             Math.random = () => 0.5; // Ensure consistent block creation
 
-            const block1 = new Block(mockRenderer as Renderer);
-            const block2 = new Block(mockRenderer as Renderer);
+            const block1 = new Block(mockRenderer);
+            const block2 = new Block(mockRenderer);
 
             // Initialize both blocks for testing
             block1.reset();
@@ -111,7 +111,7 @@ describe("Block", () => {
             // Create multiple blocks and find ones with different speeds
             const blocks: Block[] = [];
             for (let i = 0; i < 20; i++) {
-                const testBlock = new Block(mockRenderer as Renderer);
+                const testBlock = new Block(mockRenderer);
                 // Block is now automatically initialized in constructor
                 blocks.push(testBlock);
             }
@@ -135,7 +135,7 @@ describe("Block", () => {
 
             // Generate many blocks to ensure we get all types
             for (let i = 0; i < 100; i++) {
-                const testBlock = new Block(mockRenderer as Renderer);
+                const testBlock = new Block(mockRenderer);
                 // Block is now automatically initialized in constructor
                 foundTypes.add(testBlock.blockData.speed);
             }
@@ -164,7 +164,7 @@ describe("Block", () => {
         it("should generate blocks within horizontal bounds", () => {
             // Test many random generations to ensure bounds are respected
             for (let i = 0; i < 50; i++) {
-                const testBlock = new Block(mockRenderer as Renderer);
+                const testBlock = new Block(mockRenderer);
                 expect(testBlock.x).toBeGreaterThanOrEqual(-1);
                 expect(testBlock.x + testBlock.width).toBeLessThanOrEqual(1);
             }
