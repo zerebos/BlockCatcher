@@ -1,8 +1,8 @@
-# 🌟 BlockCatcher
-
-> **A synthwave-inspired WebGL block-catching game that will test your reflexes and captivate your senses.**
-
 <div align="center">
+  
+![image](https://github.com/user-attachments/assets/9bc72a87-26b7-4fed-ba8a-e2910f3f0ea3)
+
+**A synthwave-inspired WebGL block-catching game that will test your reflexes and captivate your senses.**
 
 [![Play Now](https://img.shields.io/badge/🎮_Play_Now-Live_Demo-ff1493?style=for-the-badge)](http://zerebos.github.io/BlockCatcher/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
