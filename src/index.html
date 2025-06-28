@@ -64,12 +64,17 @@
                     <div class="flex flex-space-evenly" id="hud" role="status" aria-live="polite" aria-label="Game statistics">
                         <span>Points: <span id="score" aria-label="Current score">0</span></span>
                         <span>Time: <span id="time" aria-label="Time remaining">01:00</span></span>
-                        <button id="audio-toggle"
-                                type="button"
-                                aria-label="Toggle sound effects on or off"
-                                class="audio-button">
-                            🔊
-                        </button>
+                        <div class="audio-control" role="group" aria-label="Audio controls">
+                            <label for="volume-slider" class="sr-only">Audio volume</label>
+                            <input type="range"
+                                   id="volume-slider"
+                                   min="0"
+                                   max="100"
+                                   value="60"
+                                   aria-label="Audio volume percentage"
+                                   class="volume-slider">
+                            <span id="volume-icon" class="volume-icon" aria-hidden="true">🔊</span>
+                        </div>
                     </div>
 
                     <canvas id="gl-canvas"

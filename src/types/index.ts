@@ -15,7 +15,7 @@ export interface GameElements {
     status: HTMLElement;
     play: HTMLElement;
     playParent: HTMLElement;
-    audioToggle: HTMLButtonElement;
+    audioToggle: HTMLInputElement; // Changed from HTMLButtonElement to HTMLInputElement for volume slider
 }
 
 export interface UIState {

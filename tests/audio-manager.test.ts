@@ -60,22 +60,26 @@ describe("Audio Manager", () => {
     });
 
     describe("Audio Controls", () => {
-        it("should toggle mute on and off", async () => {
+        it("should set and get volume correctly", () => {
+            expect(audioManager.isEnabled()).toBe(true);
+            expect(audioManager.getVolume()).toBe(0.6); // MASTER_VOLUME from config
+
+            // Test setting volume
+            audioManager.setVolume(0.8);
+            expect(audioManager.getVolume()).toBe(0.8);
             expect(audioManager.isEnabled()).toBe(true);
 
-            const result1 = audioManager.toggleMute();
-            expect(result1).toBe(false); // Returns the target state immediately
+            // Test setting volume to 0 (muted)
+            audioManager.setVolume(0);
+            expect(audioManager.getVolume()).toBe(0);
+            expect(audioManager.isEnabled()).toBe(false);
 
-            // But the actual muting happens after a delay for audio feedback
-            expect(audioManager.isEnabled()).toBe(true); // Still enabled initially
+            // Test clamping values
+            audioManager.setVolume(1.5); // Above max
+            expect(audioManager.getVolume()).toBe(1);
 
-            // Wait for the muting delay to complete
-            await new Promise(resolve => setTimeout(resolve, 150));
-            expect(audioManager.isEnabled()).toBe(false); // Now actually muted
-
-            const result2 = audioManager.toggleMute();
-            expect(result2).toBe(true);
-            expect(audioManager.isEnabled()).toBe(true); // Unmuting is immediate
+            audioManager.setVolume(-0.5); // Below min
+            expect(audioManager.getVolume()).toBe(0);
         });
     });
 
@@ -92,8 +96,8 @@ describe("Audio Manager", () => {
             expect(() => audioManager.playVictory()).not.toThrow();
         });
 
-        it("should not play sounds when muted", () => {
-            audioManager.toggleMute(); // Mute audio
+        it("should not play sounds when volume is zero", () => {
+            audioManager.setVolume(0); // Mute audio
 
             // These should not throw and should exit early
             expect(() => audioManager.playBlockCatch(1)).not.toThrow();

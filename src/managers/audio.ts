@@ -6,13 +6,14 @@ import {MASTER_VOLUME} from "../config";
 import blockCatch from "../audio/block";
 import gameOver from "../audio/gameover";
 import gameStart from "../audio/gamestart";
-import toggleMute from "../audio/mute";
 import victory from "../audio/victory";
+import toggleMute from "../audio/mute";
 
 export default class AudioManager {
     private audioContext: AudioContext | null = null;
     private masterGain: GainNode | null = null;
-    private enabled: boolean = true;
+    private volume: number = MASTER_VOLUME;
+    private lastFeedbackTime: number = 0;
 
     constructor() {
         try {
@@ -23,12 +24,11 @@ export default class AudioManager {
             // Create master gain node for volume control
             this.masterGain = this.audioContext.createGain();
             this.masterGain.connect(this.audioContext.destination);
-            this.masterGain.gain.value = MASTER_VOLUME; // Default volume
+            this.masterGain.gain.value = this.volume;
         }
         catch (error) {
             // eslint-disable-next-line no-console
             console.warn("Web Audio API not supported:", error);
-            this.enabled = false;
         }
     }
 
@@ -48,43 +48,39 @@ export default class AudioManager {
     }
 
     /**
-     * Toggle audio on/off with audio feedback
-     * Returns the final state, and optionally takes a callback for UI updates
+     * Set volume level (0-1)
      */
-    toggleMute(uiUpdateCallback?: (enabled: boolean) => void): boolean {
-        // Play feedback sound before changing state (so we can hear it when muting)
-        if (this.enabled) {
-            // Currently enabled, about to mute - play feedback first
-            this.playMuteToggleSound(true);
-            // Delay the actual muting so we can hear the feedback
-            setTimeout(() => {
-                this.enabled = false;
-                if (this.masterGain) this.masterGain.gain.value = 0;
-                // Update UI after the state actually changes
-                uiUpdateCallback?.(false);
-            }, 120);
-            return false; // Will be muted after timeout
+    setVolume(volume: number): void {
+        this.volume = Math.max(0, Math.min(1, volume)); // Clamp between 0 and 1
+
+        if (this.masterGain) {
+            this.masterGain.gain.value = this.volume;
         }
 
-        // Currently muted, about to unmute - unmute first then play feedback
-        this.enabled = true;
-        if (this.masterGain) this.masterGain.gain.value = MASTER_VOLUME;
-
-        // Update UI immediately for unmuting
-        uiUpdateCallback?.(true);
-
-        // Small delay to ensure audio system is ready
-        setTimeout(() => {
-            this.playMuteToggleSound(false);
-        }, 10);
-        return true;
+        // Play feedback sound when adjusting volume (except when setting to 0)
+        // Use a softer, shorter beep that's more appropriate for volume adjustment
+        // Throttle feedback to avoid excessive noise when dragging slider
+        if (this.volume > 0 && this.audioContext && this.masterGain) {
+            const now = Date.now();
+            if (now - this.lastFeedbackTime > 50) { // Throttle to max once per 150ms
+                this.playVolumeChangeFeedback();
+                this.lastFeedbackTime = now;
+            }
+        }
     }
 
     /**
-     * Check if audio is enabled
+     * Get current volume level (0-1)
+     */
+    getVolume(): number {
+        return this.volume;
+    }
+
+    /**
+     * Check if audio is enabled (volume > 0)
      */
     isEnabled(): boolean {
-        return this.enabled && this.audioContext !== null;
+        return this.volume > 0 && this.audioContext !== null;
     }
 
     /**
@@ -120,14 +116,10 @@ export default class AudioManager {
     }
 
     /**
-     * Play mute/unmute feedback sound
+     * Play a brief volume change feedback sound
      */
-    private playMuteToggleSound(isMuting: boolean): void {
+    private playVolumeChangeFeedback(): void {
         if (!this.audioContext || !this.masterGain) return;
-
-        // Only play if we're currently enabled (so we hear the mute sound)
-        if (!this.enabled) return;
-
-        toggleMute(this.audioContext, this.masterGain, isMuting);
+        return toggleMute(this.audioContext, this.masterGain, false);
     }
 }

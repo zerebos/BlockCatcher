@@ -34,3 +34,28 @@ export default function toggleMute(ctx: AudioContext, gain: GainNode, isMuting: 
     oscillator.start(now);
     oscillator.stop(now + 0.1);
 }
+
+// alternate
+// try {
+//     // Create a brief, soft tone to indicate volume change
+//     const oscillator = this.audioContext.createOscillator();
+//     const gainNode = this.audioContext.createGain();
+
+//     oscillator.connect(gainNode);
+//     gainNode.connect(this.masterGain);
+
+//     // Use a softer, higher pitch than other game sounds
+//     oscillator.frequency.value = 800; // Higher pitch for subtlety
+//     oscillator.type = "sine"; // Smoother tone
+
+//     // Very brief and soft - use setValueAtTime for better compatibility
+//     gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+//     gainNode.gain.setValueAtTime(0.001, this.audioContext.currentTime + 0.1);
+
+//     oscillator.start(this.audioContext.currentTime);
+//     oscillator.stop(this.audioContext.currentTime + 0.1);
+// }
+// catch {
+//     // Silently fail if audio feedback can't be played
+//     // This prevents test failures in environments without full Web Audio API support
+// }

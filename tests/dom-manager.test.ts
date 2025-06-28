@@ -51,7 +51,7 @@ describe("DOM Manager", () => {
             expect(window.document.getElementById("time")).toBeTruthy();
             expect(window.document.getElementById("status")).toBeTruthy();
             expect(window.document.getElementById("play")).toBeTruthy();
-            expect(window.document.getElementById("audio-toggle")).toBeTruthy();
+            expect(window.document.getElementById("volume-slider")).toBeTruthy();
         });
 
         it("should get canvas element after initialization", () => {
@@ -154,20 +154,33 @@ describe("DOM Manager", () => {
             expect(window.document.activeElement as unknown).toBe(canvas);
         });
 
-        it("should update audio button state", () => {
-            const audioButton = document.getElementById("audio-toggle")! as HTMLButtonElement;
+        it("should update volume slider and icon", () => {
+            const volumeSlider = document.getElementById("volume-slider")! as HTMLInputElement;
+            const volumeIcon = document.getElementById("volume-icon")!;
 
-            // Test enabled state
-            domManager.updateAudioButton(true);
-            expect(audioButton.textContent).toBe("🔊");
-            expect(audioButton.getAttribute("aria-label")).toBe("Mute sound effects");
-            expect(audioButton.classList.contains("muted")).toBe(false);
+            // Test volume at 80%
+            domManager.updateVolumeSlider(80);
+            expect(volumeSlider.value).toBe("80");
+            expect(volumeIcon.textContent).toBe("🔊");
+            expect(volumeIcon.classList.contains("muted")).toBe(false);
 
-            // Test disabled state
-            domManager.updateAudioButton(false);
-            expect(audioButton.textContent).toBe("🔇");
-            expect(audioButton.getAttribute("aria-label")).toBe("Unmute sound effects");
-            expect(audioButton.classList.contains("muted")).toBe(true);
+            // Test volume at 50% (medium)
+            domManager.updateVolumeSlider(50);
+            expect(volumeSlider.value).toBe("50");
+            expect(volumeIcon.textContent).toBe("🔉");
+            expect(volumeIcon.classList.contains("muted")).toBe(false);
+
+            // Test volume at 20% (low)
+            domManager.updateVolumeSlider(20);
+            expect(volumeSlider.value).toBe("20");
+            expect(volumeIcon.textContent).toBe("🔈");
+            expect(volumeIcon.classList.contains("muted")).toBe(false);
+
+            // Test volume at 0% (muted)
+            domManager.updateVolumeSlider(0);
+            expect(volumeSlider.value).toBe("0");
+            expect(volumeIcon.textContent).toBe("🔇");
+            expect(volumeIcon.classList.contains("muted")).toBe(true);
         });
     });
 
@@ -247,17 +260,23 @@ describe("DOM Manager", () => {
             domManager.initialize();
         });
 
-        it("should add audio toggle listener", () => {
+        it("should add volume change listener", () => {
             let callbackCalled = false;
-            const callback = () => {callbackCalled = true;};
+            let receivedVolume = 0;
+            const callback = (volume: number) => {
+                callbackCalled = true;
+                receivedVolume = volume;
+            };
 
-            domManager.addAudioToggleListener(callback);
+            domManager.addVolumeChangeListener(callback);
 
-            // Simulate click
-            const audioButton: HTMLButtonElement = window.document.getElementById("audio-toggle") as unknown as HTMLButtonElement;
-            audioButton.click();
+            // Simulate volume change
+            const volumeSlider: HTMLInputElement = window.document.getElementById("volume-slider") as unknown as HTMLInputElement;
+            volumeSlider.value = "75";
+            volumeSlider.dispatchEvent(new Event("input"));
 
             expect(callbackCalled).toBe(true);
+            expect(receivedVolume).toBe(75);
         });
 
         it("should add canvas event listeners", () => {

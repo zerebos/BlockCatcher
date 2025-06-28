@@ -51,25 +51,24 @@
     border-bottom: 1px solid var(--border);
 }
 
-#hud > span:first-child {
-    justify-self: start;
+#hud > span,
+#hud > div {
     background: var(--hover-bg);
     padding: 6px 12px;
     border-radius: 6px;
     border: 1px solid var(--border);
     font-size: 0.9rem;
+}
+
+#hud > span:first-child {
+    justify-self: start;
 }
 
 #hud > span:last-of-type {
     justify-self: center;
-    background: var(--hover-bg);
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    font-size: 0.9rem;
 }
 
-#hud > .audio-button {
+#hud > .audio-control {
     justify-self: end;
 }
 
@@ -103,49 +102,6 @@
     100% {
         text-shadow: 0 0 12px rgba(255, 0, 128, 0.6);
     }
-}
-
-/* Audio toggle button */
-.audio-button {
-    background: var(--hover-bg);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    min-width: 36px;
-    min-height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.audio-button:hover {
-    background: var(--border-light);
-    border-color: var(--synthwave-cyan);
-    box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
-}
-
-.audio-button:focus {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-}
-
-.audio-button:active {
-    transform: scale(0.95);
-}
-
-.audio-button.muted {
-    opacity: 0.5;
-    background: var(--bg-end);
-    border-color: var(--border);
-}
-
-.audio-button.muted:hover {
-    background: var(--hover-bg);
-    opacity: 0.7;
 }
 
 #canvas-wrap {
@@ -279,5 +235,178 @@
 
     #play {
         font-size: 1rem;
+    }
+}
+
+/* Volume control container */
+#hud > .audio-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    padding: 1px;
+}
+
+/* Volume slider styling - hidden by default */
+.volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 120px;
+    height: 20px; /* Increased for better tooltip appearance */
+    border-radius: 6px;
+    background: var(--hover-bg);
+    outline: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding: 17px 10px;
+
+    /* Hidden by default - positioned as tooltip to the left of the icon */
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    right: calc(100% + 12px); /* Position to the left of the icon */
+    /* top: 0; */
+    transform: translateY(4px);
+    z-index: 10;
+
+    /* Tooltip-style appearance */
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+}
+
+/* Tooltip arrow */
+.volume-slider::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(24, 24, 27, 0.95);
+}
+
+/* Show slider on audio control hover */
+.audio-control:hover .volume-slider {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0px);
+    transition-delay: 0.1s; /* Small delay before showing */
+}
+
+/* Keep slider visible when hovering over the slider itself */
+.volume-slider:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Add a small delay before hiding to prevent accidental closes */
+.volume-slider {
+    transition-delay: 0.2s;
+}
+
+.audio-control:hover .volume-slider,
+.volume-slider:hover {
+    transition-delay: 0s; /* Remove delay when showing */
+}
+
+/* Slider track styling */
+.volume-slider::-webkit-slider-track,
+.volume-slider::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    background: var(--card-bg);
+    border-radius: 2px;
+    border: none;
+}
+
+.volume-slider::-webkit-slider-thumb,
+.volume-slider::-moz-range-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(from var(--synthwave-cyan) r g b / 0.7);
+    cursor: pointer;
+    /* box-shadow: 0 0 4px rgba(0, 255, 255, 0.3); */
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.volume-slider:hover::-webkit-slider-thumb,
+.volume-slider:hover::-moz-range-thumb {
+    background: var(--synthwave-cyan);
+    /* box-shadow: 0 0 8px rgba(0, 255, 255, 0.5); */
+    /* transform: scale(1.1); */
+}
+
+.volume-slider:focus {
+    opacity: 1;
+    visibility: visible;
+    outline: 2px solid var(--synthwave-pink);
+    outline-offset: 2px;
+    transition-delay: 0s;
+    transform: translateY(0px);
+}
+
+/* Volume icon */
+.volume-icon {
+    font-size: 16px;
+    min-width: 20px;
+    text-align: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.volume-icon:hover {
+    transform: scale(1.1);
+}
+
+.volume-icon.muted {
+    opacity: 0.5;
+}
+
+.volume-icon.muted:hover {
+    opacity: 0.8;
+}
+
+/* Accessibility: High contrast mode */
+@media (prefers-contrast: high) {
+    .volume-slider {
+        background: #666;
+    }
+
+    .volume-slider::-webkit-slider-thumb,
+    .volume-slider::-moz-range-thumb {
+        background: #fff;
+        border: 2px solid #000;
+    }
+}
+
+/* Mobile and touch device improvements */
+@media (max-width: 768px) {
+    .volume-slider {
+        width: 100px; /* Slightly wider for easier touch interaction */
+        height: 24px; /* Taller for better touch targets */
+    }
+
+    /* On mobile, show slider on touch/click rather than just hover */
+    .audio-control:active .volume-slider,
+    .volume-icon:active + .volume-slider {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-2px);
+        transition-delay: 0s;
+    }
+
+    /* Keep slider visible longer on mobile */
+    .volume-slider {
+        transition-delay: 1s; /* Longer delay on mobile */
     }
 }

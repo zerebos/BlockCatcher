@@ -54,11 +54,10 @@ export default new class Game {
 
         // Initialize audio manager
         this.audioManager = new AudioManager();
-        this.domManager.updateAudioButton(this.audioManager.isEnabled());
-        this.domManager.addAudioToggleListener(() => {
-            this.audioManager.toggleMute((enabled) => {
-                this.domManager.updateAudioButton(enabled);
-            });
+        this.domManager.updateVolumeSlider(this.audioManager.getVolume() * 100); // Convert 0-1 to 0-100
+        this.domManager.addVolumeChangeListener((volume: number) => {
+            this.audioManager.setVolume(volume / 100); // Convert 0-100 to 0-1
+            this.domManager.updateVolumeIcon(volume);
         });
 
         // Initialize game UI

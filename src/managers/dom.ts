@@ -24,7 +24,7 @@ export default class DOMManager {
             this.elements.status = this.getElement("status");
             this.elements.play = this.getElement("play");
             this.elements.playParent = this.elements.play.parentElement!;
-            this.elements.audioToggle = this.getElement<HTMLButtonElement>("audio-toggle");
+            this.elements.audioToggle = this.getElement<HTMLInputElement>("volume-slider");
 
             this.isInitialized = true;
             return true;
@@ -212,29 +212,54 @@ export default class DOMManager {
     }
 
     /**
-     * Update audio button state
+     * Update volume slider value
      */
-    updateAudioButton(enabled: boolean): void {
+    updateVolumeSlider(volume: number): void {
         this.ensureInitialized();
+        const slider = this.elements.audioToggle as HTMLInputElement;
+        slider.value = volume.toString();
+        this.updateVolumeIcon(volume);
+    }
 
-        const button = this.elements.audioToggle;
-        button.textContent = enabled ? "🔊" : "🔇";
-        button.setAttribute("aria-label", enabled ? "Mute sound effects" : "Unmute sound effects");
-
-        if (enabled) {
-            button.classList.remove("muted");
-        }
-        else {
-            button.classList.add("muted");
+    /**
+     * Update volume icon based on volume level
+     */
+    updateVolumeIcon(volume: number): void {
+        this.ensureInitialized();
+        const icon = document.getElementById("volume-icon");
+        if (icon) {
+            // Show different icons based on volume level
+            if (volume === 0) {
+                icon.textContent = "🔇"; // Muted
+            }
+            else if (volume < 30) {
+                icon.textContent = "🔈"; // Low volume
+            }
+            else if (volume < 70) {
+                icon.textContent = "🔉"; // Medium volume
+            }
+            else {
+                icon.textContent = "🔊"; // High volume
+            }
+            icon.classList.toggle("muted", volume === 0);
         }
     }
 
     /**
-     * Add click listener to audio button
+     * Add change listener to volume slider
      */
-    addAudioToggleListener(callback: () => void): void {
+    addVolumeChangeListener(callback: (volume: number) => void): void {
         this.ensureInitialized();
-        this.elements.audioToggle.addEventListener("click", callback);
+        const slider = this.elements.audioToggle as HTMLInputElement;
+
+        // Handle both input (real-time) and change (final value) events
+        const handleVolumeChange = () => {
+            const volume = parseInt(slider.value, 10);
+            callback(volume);
+        };
+
+        slider.addEventListener("input", handleVolumeChange);
+        slider.addEventListener("change", handleVolumeChange);
     }
 
     /**
