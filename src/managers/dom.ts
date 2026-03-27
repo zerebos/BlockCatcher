@@ -4,10 +4,25 @@
  */
 
 import type {GameElements, UIState} from "../types";
+import type {LeaderboardEntry} from "../leaderboard/types";
 
 export default class DOMManager {
     private elements: GameElements;
     private isInitialized = false;
+
+    // Leaderboard elements (initialized alongside the main elements)
+    private leaderboardOverlay!: HTMLElement;
+    private leaderboardNameEntry!: HTMLElement;
+    private leaderboardResult!: HTMLElement;
+    private leaderboardForm!: HTMLFormElement;
+    private playerNameInput!: HTMLInputElement;
+    private leaderboardTableWrap!: HTMLElement;
+    private leaderboardBody!: HTMLElement;
+    private leaderboardLoading!: HTMLElement;
+
+    // Handlers set by the game; called by the one-time DOM listeners below
+    private leaderboardSubmitHandler: ((name: string) => void) | null = null;
+    private leaderboardSkipHandler: (() => void) | null = null;
 
     constructor() {
         this.elements = {} as GameElements;
@@ -25,6 +40,27 @@ export default class DOMManager {
             this.elements.play = this.getElement("play");
             this.elements.playParent = this.elements.play.parentElement!;
             this.elements.audioToggle = this.getElement<HTMLInputElement>("volume-slider");
+
+            // Leaderboard elements
+            this.leaderboardOverlay = this.getElement("leaderboard-overlay");
+            this.leaderboardNameEntry = this.getElement("leaderboard-name-entry");
+            this.leaderboardResult = this.getElement("leaderboard-result");
+            this.leaderboardForm = this.getElement<HTMLFormElement>("leaderboard-form");
+            this.playerNameInput = this.getElement<HTMLInputElement>("player-name");
+            this.leaderboardTableWrap = this.getElement("leaderboard-table-wrap");
+            this.leaderboardBody = this.getElement("leaderboard-body");
+            this.leaderboardLoading = this.getElement("leaderboard-loading");
+
+            // Wire up leaderboard form/button once; handlers are set later via setLeaderboardHandlers
+            this.leaderboardForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const name = this.playerNameInput.value.trim() || "Player";
+                if (this.leaderboardSubmitHandler) this.leaderboardSubmitHandler(name);
+            });
+
+            this.getElement("leaderboard-skip").addEventListener("click", () => {
+                if (this.leaderboardSkipHandler) this.leaderboardSkipHandler();
+            });
 
             this.isInitialized = true;
             return true;
@@ -372,5 +408,138 @@ export default class DOMManager {
         this.ensureInitialized();
 
         this.updateGameStatus(paused ? "paused" : "playing", paused ? "Game Paused" : "");
+    }
+
+    // ─── Leaderboard ──────────────────────────────────────────────────────────
+
+    /**
+     * Register callbacks invoked by the name-entry form.
+     * Must be called before showLeaderboardNameEntry().
+     */
+    setLeaderboardHandlers(
+        onSubmit: (name: string) => void,
+        onSkip: () => void
+    ): void {
+        this.leaderboardSubmitHandler = onSubmit;
+        this.leaderboardSkipHandler = onSkip;
+    }
+
+    /**
+     * Show the name-entry phase of the leaderboard overlay.
+     * @param result      Short summary shown above the form (e.g. "YOU WIN! • 350 pts").
+     * @param defaultName Pre-fill the input with the last used name.
+     */
+    showLeaderboardNameEntry(result: string, defaultName: string): void {
+        this.ensureInitialized();
+
+        this.leaderboardResult.textContent = result;
+        this.playerNameInput.value = defaultName;
+
+        // Show entry panel, hide table panel
+        this.leaderboardNameEntry.classList.remove("hide");
+        this.leaderboardTableWrap.classList.add("hide");
+        this.leaderboardLoading.classList.add("hide");
+
+        // Show overlay; also hide the existing game overlay so it doesn't
+        // bleed through (leaderboard overlay is later in the DOM so sits on
+        // top, but explicit hiding avoids ARIA confusion).
+        this.leaderboardOverlay.classList.remove("hide");
+        this.elements.playParent.classList.add("hide");
+
+        // Focus the name input for immediate keyboard entry
+        this.playerNameInput.focus();
+        this.playerNameInput.select();
+    }
+
+    /**
+     * Show the loading spinner while entries are being fetched.
+     * Switches to the table panel with only the spinner visible.
+     */
+    showLeaderboardLoading(): void {
+        this.ensureInitialized();
+
+        this.leaderboardNameEntry.classList.add("hide");
+        this.leaderboardTableWrap.classList.remove("hide");
+        this.leaderboardLoading.classList.remove("hide");
+        this.leaderboardBody.innerHTML = "";
+    }
+
+    /**
+     * Populate and display the score table.
+     * @param entries     Sorted entries to display (from LeaderboardManager.getEntries).
+     * @param highlightId UUID of the entry just saved; that row gets the .highlight class.
+     */
+    showLeaderboardTable(entries: LeaderboardEntry[], highlightId?: string): void {
+        this.ensureInitialized();
+
+        this.leaderboardLoading.classList.add("hide");
+        this.leaderboardNameEntry.classList.add("hide");
+        this.leaderboardTableWrap.classList.remove("hide");
+
+        this.leaderboardBody.innerHTML = "";
+
+        if (entries.length === 0) {
+            const row = document.createElement("tr");
+            row.className = "empty-row";
+            const cell = document.createElement("td");
+            cell.colSpan = 4;
+            cell.textContent = "No scores yet — be the first!";
+            row.appendChild(cell);
+            this.leaderboardBody.appendChild(row);
+            return;
+        }
+
+        for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            const row = document.createElement("tr");
+            if (highlightId && entry.id === highlightId) row.classList.add("highlight");
+
+            const rankCell = document.createElement("td");
+            const nameCell = document.createElement("td");
+            const scoreCell = document.createElement("td");
+            const timeCell = document.createElement("td");
+
+            rankCell.textContent = String(i + 1);
+            nameCell.textContent = entry.name;
+            scoreCell.textContent = String(entry.score);
+            timeCell.textContent = this.formatTime(entry.timeRemaining);
+
+            row.append(rankCell, nameCell, scoreCell, timeCell);
+            this.leaderboardBody.appendChild(row);
+        }
+    }
+
+    /** Hide the leaderboard overlay entirely. */
+    hideLeaderboard(): void {
+        this.ensureInitialized();
+        this.leaderboardOverlay.classList.add("hide");
+    }
+
+    /** Return true if the leaderboard overlay is currently visible. */
+    isLeaderboardVisible(): boolean {
+        this.ensureInitialized();
+        return !this.leaderboardOverlay.classList.contains("hide");
+    }
+
+    /**
+     * Return true when the score table (not the name-entry form) is showing.
+     * Used by game.ts to decide whether SPACE should start a new game.
+     */
+    isLeaderboardTableVisible(): boolean {
+        this.ensureInitialized();
+        return (
+            this.isLeaderboardVisible()
+            && !this.leaderboardTableWrap.classList.contains("hide")
+        );
+    }
+
+    // ─── Private helpers ──────────────────────────────────────────────────────
+
+    /** Format a seconds value as MM:SS. */
+    private formatTime(totalSeconds: number): string {
+        const s = Math.ceil(Math.max(0, totalSeconds));
+        const m = Math.floor(s / 60);
+        const rem = s % 60;
+        return `${m < 10 ? "0" + m : m}:${rem < 10 ? "0" + rem : rem}`;
     }
 }

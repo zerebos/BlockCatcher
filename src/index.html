@@ -89,6 +89,36 @@
                         <span id="status" aria-label="Game status"></span>
                         <span id="play" aria-label="Game instructions">Press SPACE to play!</span>
                     </div>
+
+                    <div class="flex column flex-justify-center overlay hide" id="leaderboard-overlay" role="dialog" aria-labelledby="leaderboard-title" aria-modal="true">
+                        <div id="leaderboard-name-entry">
+                            <span id="leaderboard-result" aria-live="polite"></span>
+                            <form id="leaderboard-form" autocomplete="off" novalidate>
+                                <label for="player-name">Your name</label>
+                                <input type="text" id="player-name" maxlength="20" placeholder="Player 1"
+                                       autocomplete="off" spellcheck="false"
+                                       aria-required="true" aria-label="Enter your name for the leaderboard">
+                                <button type="submit" id="leaderboard-submit">Save Score</button>
+                            </form>
+                            <button type="button" id="leaderboard-skip" aria-label="Skip saving score and view leaderboard">Skip</button>
+                        </div>
+                        <div id="leaderboard-table-wrap" class="hide">
+                            <h3 id="leaderboard-title">Top Scores</h3>
+                            <div id="leaderboard-loading" aria-live="polite" class="hide">Loading…</div>
+                            <table id="leaderboard-table" aria-label="Personal high scores">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Score</th>
+                                        <th scope="col">Time Left</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboard-body"></tbody>
+                            </table>
+                            <span id="leaderboard-play" class="leaderboard-cta">Press SPACE to play again!</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="game-instructions" class="sr-only">
