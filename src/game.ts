@@ -5,6 +5,8 @@ import ObjectPool from "./managers/pool";
 import Keyboard from "./managers/inputs";
 import DOMManager from "./managers/dom";
 import AudioManager from "./managers/audio";
+import LeaderboardManager from "./leaderboard/manager";
+import LocalLeaderboardProvider from "./leaderboard/providers/local";
 import {SCORE_THRESHOLD, MAX_SECONDS, BLOCK_INTERVAL} from "./config";
 
 
@@ -12,6 +14,7 @@ export default new class Game {
 
     domManager!: DOMManager;
     audioManager!: AudioManager;
+    leaderboardManager!: LeaderboardManager;
     renderer!: Renderer;
     player!: Player;
     blocks!: Block[];
@@ -62,6 +65,34 @@ export default new class Game {
 
         // Initialize game UI
         this.domManager.initializeGameUI(MAX_SECONDS);
+
+        // Initialize leaderboard with the local provider.
+        // To add a global backend later, push an additional provider into the array.
+        this.leaderboardManager = new LeaderboardManager([
+            new LocalLeaderboardProvider()
+        ]);
+
+        // Wire up name-entry form callbacks once; they close over `this`
+        // so they always see the current score / timeLeft when invoked.
+        this.domManager.setLeaderboardHandlers(
+            async (name: string) => {
+                this.leaderboardManager.savePlayerName(name);
+                const entry = this.leaderboardManager.createEntry(
+                    name,
+                    this.state.score,
+                    this.state.timeLeft
+                );
+                this.domManager.showLeaderboardLoading();
+                await this.leaderboardManager.addEntry(entry);
+                const entries = await this.leaderboardManager.getEntries();
+                this.domManager.showLeaderboardTable(entries, entry.id);
+            },
+            async () => {
+                this.domManager.showLeaderboardLoading();
+                const entries = await this.leaderboardManager.getEntries();
+                this.domManager.showLeaderboardTable(entries);
+            }
+        );
 
         /** @type {Renderer} */
         this.renderer = new Renderer(this.domManager.getCanvas());
@@ -145,6 +176,19 @@ export default new class Game {
     startGame() {
         if (this.state.started) return this.togglePause();
 
+        // While the name-entry form is showing, ignore SPACE so the player
+        // can type their name without accidentally restarting the game.
+        if (this.domManager.isLeaderboardVisible()) {
+            if (this.domManager.isLeaderboardTableVisible()) {
+                // Score table is showing — dismiss it and start a new game
+                this.domManager.hideLeaderboard();
+            }
+            else {
+                // Name-entry form is showing — do nothing; Enter submits the form
+                return;
+            }
+        }
+
         // Resume audio context on user interaction
         this.audioManager.resumeAudio();
 
@@ -186,6 +230,15 @@ export default new class Game {
             this.blockPool.release(block);
         }
         this.blocks.splice(0, this.blocks.length);
+
+        // Show the leaderboard name-entry overlay
+        const resultText = won
+            ? `YOU WIN! \u2022 ${this.state.score} pts`
+            : `GAME OVER \u2022 ${this.state.score} pts`;
+        this.domManager.showLeaderboardNameEntry(
+            resultText,
+            this.leaderboardManager.getLastPlayerName()
+        );
     }
 
     togglePause() {
